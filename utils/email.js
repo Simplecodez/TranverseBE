@@ -24,14 +24,11 @@ class Email {
   }
 
   async send(template, subject, licenceNumber) {
-    const html = pug.renderFile(
-      path.join(currentDir, `../views/email/welcome.pug`),
-      {
-        name: this.name,
-        licenceNumber,
-        subject
-      }
-    );
+    const html = pug.renderFile(path.join(currentDir, `../views/email/welcome.pug`), {
+      name: this.name,
+      licenceNumber,
+      subject
+    });
 
     const mailOptions = {
       from: this.from,
@@ -45,6 +42,41 @@ class Email {
 
   async sendWelcome(licenceNumber) {
     await this.send('Welcome', 'Welcome to Traverse!', licenceNumber);
+  }
+
+  static async sendProjectCreated(recipientEmail, projectName, url, subject) {
+    const html = pug.renderFile(path.join(currentDir, `../views/email/projectCreated.pug`), {
+      name: this.name,
+      projectName,
+      subject,
+      url
+    });
+
+    const mailOptions = {
+      from: this.from,
+      to: recipientEmail,
+      subject,
+      html,
+      text: htmlToText.fromString(html)
+    };
+    await this.newTransport().sendMail(mailOptions);
+  }
+
+  static async sendUserProject(projectName, subject) {
+    const html = pug.renderFile(path.join(currentDir, `../views/email/projectCreated.pug`), {
+      name: this.name,
+      projectName,
+      subject
+    });
+
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject,
+      html,
+      text: htmlToText.fromString(html)
+    };
+    await this.newTransport().sendMail(mailOptions);
   }
 }
 
