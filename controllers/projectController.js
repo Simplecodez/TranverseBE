@@ -27,6 +27,7 @@ const createProject = catchAsyn(async (req, res, next) => {
   project.email = req.user.email;
   project.name = req.user.name;
   const url = `${req.protocol}://${req.get("host")}/accept?id=${project.id}`;
+
   try {
     const promiseAsync = teamMembers.map((email) =>
       Email(project).sendProjectCreated(
@@ -40,7 +41,7 @@ const createProject = catchAsyn(async (req, res, next) => {
       project.project.projectName,
       "Successful project creation!"
     );
-    const totalPromise = [...promiseAsync, Email.sendUserProject];
+    const totalPromise = [...promiseAsync, userProjectPromise];
     await Promise.all(totalPromise);
   } catch (err) {
     await Project.deleteOne({ _id: project._id });
