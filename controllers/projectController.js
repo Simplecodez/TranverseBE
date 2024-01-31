@@ -27,18 +27,23 @@ const createProject = catchAsyn(async (req, res, next) => {
   project.email = req.user.email;
   project.name = req.user.name;
   const url = `${req.protocol}://${req.get("host")}/accept?id=${project.id}`;
-  const promiseAsync = teamMembers.map((email) =>
-    Email(project).sendProjectCreated(
-      email,
-      project.projectName,
-      url,
-      "You've been invited to join a project on Traverse."
-    )
-  );
-  const userProjectPromise = Email.sendUserProject(
-    project.project.projectName,
-    "Successful project creation!"
-  );
-  const totalPromise = [...promiseAsync, Email.sendUserProject];
-  await Promise.all(totalPromise);
+  try {
+    const promiseAsync = teamMembers.map((email) =>
+      Email(project).sendProjectCreated(
+        email,
+        project.projectName,
+        url,
+        "You've been invited to join a project on Traverse."
+      )
+    );
+    const userProjectPromise = Email.sendUserProject(
+      project.project.projectName,
+      "Successful project creation!"
+    );
+    const totalPromise = [...promiseAsync, Email.sendUserProject];
+    await Promise.all(totalPromise);
+  } catch (err) {
+    await Project.deleteOne({ _id: project._id });
+    return next(err);
+  }
 });
