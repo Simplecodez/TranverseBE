@@ -9,7 +9,7 @@ const currentDir = path.dirname(fileURLToPath(import.meta.url));
 class Email {
   constructor(model) {
     this.to = model.email;
-    this.name = model.name.split('')[0];
+    this.name = model.name.split(' ')[0];
     this.from = `Traverse <welcome@traverse.com>`;
   }
 
