@@ -79,6 +79,22 @@ class Email {
     };
     await this.newTransport().sendMail(mailOptions);
   }
+
+  async sendResetToken(resetToken) {
+    const html = pug.renderFile(path.join(currentDir, `../views/email/resetToken.pug`), {
+      resetToken
+    });
+
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject: "Reset token",
+      html,
+      text: htmlToText.fromString(html)
+    };
+    await this.newTransport().sendMail(mailOptions);
+  }
+
 }
 
 export default Email;
