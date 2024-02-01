@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
   },
   companyName: {
     type: String,
+    required: false,
     validate: {
       validator: (value) => {
         return validator.isLength(value, { min: 3, max: 50 })&&validator.matches(value, /^[a-zA-Z0-9\s]+$/);
@@ -32,6 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   website: {
     type: String,
+    required: false,
     validate: {
       validator: (value) => {
         return validator.isURL(value, { require_protocol: false });
