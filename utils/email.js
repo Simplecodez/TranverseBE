@@ -44,7 +44,8 @@ class Email {
     await this.send('Welcome', 'Welcome to Traverse!', licenceNumber);
   }
 
-  static async sendProjectCreated(recipientEmail, projectName, url, subject) {
+   async sendProjectCreated(recipientEmail, projectName, url, subject) {
+    console.log(url)
     const html = pug.renderFile(path.join(currentDir, `../views/email/projectCreated.pug`), {
       name: this.name,
       projectName,
@@ -62,8 +63,8 @@ class Email {
     await this.newTransport().sendMail(mailOptions);
   }
 
-  static async sendUserProject(projectName, subject) {
-    const html = pug.renderFile(path.join(currentDir, `../views/email/projectCreated.pug`), {
+  async sendUserProject(projectName, subject) {
+    const html = pug.renderFile(path.join(currentDir, `../views/email/userCreatedProject.pug`), {
       name: this.name,
       projectName,
       subject

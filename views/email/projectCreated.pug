@@ -1,18 +1,18 @@
 extends baseEmail
 
 block content
-p Hi there,
-p #{name} has invited you to join #{projectName} project.
+    p Hi there,
+    p #{name} has invited you to join #{projectName} project.
 
-table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
-    tbody
-        tr
-            td(align='left')
-                table(role='presentation', border='0', cellpadding='0', cellspacing='0')
-                    tbody
-                        tr
-                            td
-                                a(href=`${url}`, target='_blank') Accept
-p For questions and enquiries you can reach us via-
-p email: help@traverse.com
- 
+    table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+        tbody
+            tr
+                td(align='left')
+                    table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+                        tbody
+                            tr
+                                td
+                                    a(href=`${url}`, target='_blank') Accept
+    p For questions and enquiries you can reach us via-
+    p email: help@traverse.com
+    

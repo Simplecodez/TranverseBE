@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import { promisify } from "util";
+import jwt from 'jsonwebtoken';
 import User from "../models/userModel.js";
 import catchAsync from "../utils/catchAsync.js";
 import Email from "../utils/email.js";
@@ -73,4 +75,45 @@ const signin = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, "Signed in successfully.", req, res);
 });
 
-export { signup, signin, activateAccount };
+
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles ['admin','user' 'team-lead']. role = 'user'
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError('You do have permission to perform this action!', 403));
+    }
+    next();
+  };
+};
+
+
+const protect = catchAsync(async (req, res, next) => {
+  // get token and check if it exist
+  const token = req.cookies.jwt;
+  if (!token) {
+    return next(new AppError('Your are not logged in! Please log in to get access.', 401));
+  }
+  // verification
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // check if user still exists
+  const freshUser = await User.findById(decoded.id);
+  if (!freshUser) {
+    return next(new AppError('The user belonging to this token no longer exist.', 401));
+  }
+  
+  if (freshUser.active === false) 
+    return next(new AppError('Please activate your account to continue.', 401));
+
+  // check if user changed password after the token issued
+  if (freshUser.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError('User recently changed password! Please log in again.', 401));
+  }
+
+  //Grant access to protected route
+  req.user = freshUser;
+  next();
+});
+
+
+export { signup, signin, activateAccount, protect, restrictTo};

@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
         return validator.isLength(value, { min: 3, max: 50 })&&validator.matches(value, /^[a-zA-Z\s]+$/)
       },
       message: 'Please your name must be 3 or more characters.',
-    },
+    }
   },
   email: {
     type: String,
@@ -83,6 +83,15 @@ userSchema.methods.correctPassword = async function (
   ownerPassword
 ) {
   return await bcrypt.compare(candidatePassword, ownerPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
 };
 
 export default mongoose.model('User', userSchema);

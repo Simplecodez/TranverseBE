@@ -14,4 +14,9 @@ const calenderSchema = new mongoose.Schema({
         type: Number,
         default: 1
     },
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    }
 })

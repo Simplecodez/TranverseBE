@@ -7,8 +7,8 @@ const signToken = (id, expiresin) => {
 };
 
 // refactored the feedback
-const createSendToken = (foundSchool, statusCode, message, req, res) => {
-  const token = signToken(foundSchool._id, process.env.JWT_EXPIRES_IN);
+const createSendToken = (user, statusCode, message, req, res) => {
+  const token = signToken(user._id, process.env.JWT_EXPIRES_IN);
 
   res.cookie('jwt', token, {
     expires: new Date(
@@ -19,13 +19,13 @@ const createSendToken = (foundSchool, statusCode, message, req, res) => {
     sameSite: 'None'
   });
   // removes the password from the output
-  delete foundSchool._doc.password;
-  delete foundSchool._doc.active;
+  delete user._doc.password;
+  delete user._doc.active;
   res.status(statusCode).json({
     status: 'success',
     message,
     data: {
-      user: foundSchool
+      user
     }
   });
 };

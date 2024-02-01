@@ -4,14 +4,31 @@ import validator from 'validator';
 const projectSchema = new mongoose.Schema({
     projectName:{
         type: String,
-        required: [true, 'Please provide a project name.']
+        required: [true, 'Please provide a project name.'],
+        validate: {
+            validator: (value) => {
+              return validator.isLength(value, { min: 3, max: 50 })&&validator.matches(value, /^[a-zA-Z\s]+$/)
+            },
+            message: 'Please your name must be 3 or more characters.',
+        }
     },
-    Description:{
+    description:{
         type: String,
-        required: [true, 'Please provide a project description.']
+        required: [true, 'Please provide a project description.'],
+        validate: {
+            validator: (value) => {
+              return validator.isLength(value, { min: 3, max: 50 })&&validator.matches(value, /^[a-zA-Z\s]+$/)
+            },
+            message: 'Please your name must be 3 or more characters.',
+        }
+    },
+    owner:{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
     },
     teamMembers:{
-        type: Array,
+        type: [mongoose.Schema.ObjectId],
+        ref: 'User',
         default: []
     },
     duration:{
@@ -31,7 +48,12 @@ const projectSchema = new mongoose.Schema({
     endDate:{
         type: Date,
         required:[true, "Please provide an end date."]
-    }
+    },
+    active: {
+        type: Boolean,
+        default: true,
+        select: false
+    },
 })
 
-export default mongoose.model('Project', projectSchemaSchema);
+export default mongoose.model('Project', projectSchema);

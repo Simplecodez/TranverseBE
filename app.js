@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import globalErrorHandler from './controllers/errorController.js';
 import AppError from './utils/appError.js';
+import projectRoutes from './routes/projectRoutes.js'
 
 const app = express();
 const port = 5000;
@@ -25,7 +26,9 @@ app.get('/', (req, res) => {
   res.send('welcome to TraverseBE');
 });
 
+
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/project', projectRoutes);
 app.use('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
