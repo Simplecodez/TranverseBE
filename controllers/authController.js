@@ -115,6 +115,14 @@ const protect = catchAsync(async (req, res, next) => {
   next();
 });
 
+const getMe = (req, res) =>{
+
+  res.status(200).json({
+    status: "success",
+    user: req.user
+  })
+}
+
 
 const signout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
@@ -176,4 +184,4 @@ const resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, " Password reset was successful.", req, res);
 });
 
-export { signup, signin, activateAccount, protect, restrictTo, signout, forgotPassword, resetPassword};
+export { signup, signin, activateAccount, protect, restrictTo, signout, forgotPassword, resetPassword, getMe};
