@@ -22,7 +22,7 @@ const limiter = rateLimit({
 //You this to affect only the /api routes
 app.use('/api', limiter)
 const allowedOrigins = [
-  'https://edtechdev.vercel.app',
+  'https://traverse-eight.vercel.app',
   'http://localhost:3000'
 ];
 
