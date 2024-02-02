@@ -1,13 +1,26 @@
 import express from 'express';
 import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import xss from 'xss-clean'
+import mongoSanitize from 'express-mongo-sanitize';
+
 import globalErrorHandler from './controllers/errorController.js';
 import AppError from './utils/appError.js';
 import projectRoutes from './routes/projectRoutes.js'
+import calenderRoutes from "./routes/calenderRoutes.js";
 
 const app = express();
-const port = 5000;
+app.use(helmet());
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!'
+});
+//You this to affect only the /api routes
+app.use('/api', limiter)
 const allowedOrigins = [
   'https://edtechdev.vercel.app',
   'http://localhost:3000'
@@ -19,9 +32,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
-
+app.use(express.json({ limit: '10kb' }));
+app.use(mongoSanitize());
+app.use(xss());
 app.get('/', (req, res) => {
   res.send('welcome to TraverseBE');
 });
@@ -29,6 +43,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/project', projectRoutes);
+app.use('/api/v1/calendar', calenderRoutes);
 app.use('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });

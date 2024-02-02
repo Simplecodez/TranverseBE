@@ -5,13 +5,16 @@ import {
         createProject, 
         acceptProject, 
         updateProjectStatus,
-        deleteProject        
+        deleteProject,        
+        getOne
        } from '../controllers/projectController.js';
 
 const router = express.Router();
 router.use(protect);
 router.route('/').get(getAll).post(createProject);
-router.route('/:id').patch(updateProjectStatus).delete(restrictTo('user'), deleteProject)
+router.route('/:id').get(getOne).
+        patch(updateProjectStatus).
+        delete(restrictTo('user'), deleteProject)
 router.get('/accept', acceptProject);
 
 

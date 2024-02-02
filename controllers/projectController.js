@@ -88,13 +88,26 @@ const getAll = catchAsync(async (req, res, next)=>{
     }).populate('owner')
       .populate('teamMembers')
 
-
-
     res.status(200).json({
         status: 'success',
         count: projects.length,
         projects
     })
+})
+
+const getOne = catchAsync(async (req, res, next)=>{
+  const project = await Project.findOne({ active: true,
+      $or:[
+          {owner:req.user._id}, 
+          { teamMembers: { $in: [req.user._id] } }
+      ], _id: req.params.id
+  }).populate('owner')
+    .populate('teamMembers')
+
+  res.status(200).json({
+      status: 'success',
+      project
+  })
 })
 
 
@@ -111,4 +124,4 @@ const deleteProject = catchAsync(async (req, res, next)=>{
 
 
 
-export {createProject, acceptProject, updateProjectStatus, getAll, deleteProject}
+export {createProject, acceptProject, updateProjectStatus, getOne, getAll, deleteProject}
