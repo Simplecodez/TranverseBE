@@ -1,10 +1,12 @@
 import Project from "../models/projectModel.js";
+import User from "../models/userModel.js";
+import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
 import Email from "../utils/email.js";
 
 const createProject = catchAsync(async (req, res, next) => {
   const {
-    projectName,
+    title,
     description,
     teamMembers,
     startDate,
@@ -16,7 +18,7 @@ const createProject = catchAsync(async (req, res, next) => {
   const durationInMilliseconds = mongoEndDate-mongoStartDate
   const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
   const newProject = {
-    projectName,
+    title,
     description,
     duration: durationInDays,
     startDate: mongoStartDate,
@@ -27,7 +29,7 @@ const createProject = catchAsync(async (req, res, next) => {
   const project = await Project.create(newProject);
   project.email = req.user.email;
   project.name = req.user.name;
-  const url = `${req.protocol}://${req.get("host")}/api/v1/project/accept?id=${project.id}`;
+  const url = `${req.protocol}://${req.get("host")}/api/v1/project/accept?id=${project._id}`;
   try {
     const promiseAsync = teamMembers.map((email) =>
       new Email(project).sendProjectCreated(
@@ -67,14 +69,17 @@ const updateProjectStatus = catchAsync(async (req,res,next)=>{
 
 
 const acceptProject = catchAsync(async (req, res, next)=>{
-    const userID = req.user._id
+  
+  const userID = req.user._id
     const projectID = req.query.id;
     const project = await Project.findOne({_id: projectID});
-    project.teamMembers.push(userID)
+    const member = {user:userID}
+    
+    project.teamMembers.push(member)
     await project.save();
     res.status(200).json({
         status: 'success',
-        message: `You have accepted to join the ${project.projectName} project.`
+        message: `You have accepted to join the ${project.title} project.`
     })
 })
 
@@ -122,6 +127,45 @@ const deleteProject = catchAsync(async (req, res, next)=>{
     })
 })
 
+const assignTasks = catchAsync(async (req, res, next) => {
+  const {task, email, name} = req.body
+  const projectID = req.params.id
+  const project = await Project.findOne({_id: projectID, owner: req.user._id, active: true});
+  console.log(req.user._id)
+  if (!project) {
+    return next(new AppError("Project not found, might have been deleted.", 404));
+  }
+ const member = await User.findOne({email, active: true});
+ if(!member) return next(new AppError("This user does not exist!", 400))
+ const result = project.teamMembers.find(mem => mem.user === member._id);
+
+if(result){
+  next(new AppError("The user is not a member of the project yet.", 400))
+}
+  task.assignedTo = member._id
+  project.tasks.push(task) 
+  await project.save()
+
+ 
+  try {
+    await new Email({email, name}).sendProjectCreated(
+      email,
+      project.title,
+      "to be worked on....",
+      `${req.user.name} assigned ${task.title} task to you on project - ${project.title}` 
+    )
+  } catch (error) {
+    await Project.deleteOne({ _id: project._id });
+    return next(error);
+  }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Task has been assigned successfully.'
+    })
+
+})
 
 
-export {createProject, acceptProject, updateProjectStatus, getOne, getAll, deleteProject}
+
+export {createProject, acceptProject, updateProjectStatus, getOne, getAll, deleteProject, assignTasks}

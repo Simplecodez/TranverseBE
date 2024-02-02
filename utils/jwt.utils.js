@@ -23,6 +23,7 @@ const createSendToken = (user, statusCode, message, req, res) => {
   delete user._doc.active;
   res.status(statusCode).json({
     status: 'success',
+    token,
     message,
     data: {
       user

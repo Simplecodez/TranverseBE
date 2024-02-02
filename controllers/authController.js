@@ -99,7 +99,7 @@ const protect = catchAsync(async (req, res, next) => {
   // check if user still exists
   const freshUser = await User.findById(decoded.id);
   if (!freshUser) {
-    return next(new AppError('The user belonging to this token no longer exist.', 401));
+    return next(new AppError('This account no longer has access, please create a new account to gain access.', 401));
   }
   
   if (freshUser.active === false) 
