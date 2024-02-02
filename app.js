@@ -20,7 +20,7 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again in an hour!'
 });
 //You this to affect only the /api routes
-app.use('/api', limiter)
+
 const allowedOrigins = [
   'https://traverse-eight.vercel.app',
   'http://localhost:3000'
