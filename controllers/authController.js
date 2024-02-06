@@ -189,6 +189,13 @@ const resetPassword = catchAsync(async (req, res, next) => {
 const updateAccount = catchAsync(async (req, res, next)=>{
   const user = await User.findById(req.user._id).select('+password');
   const {companyName, passwordCurrent, password, passwordConfirm} = req.body;
+  const fieldsAllowed = ['companyName', 'password'];
+  const postedFields = Object.keys(req.body)
+  const invalidFields = postedFields.filter(element => !fieldsAllowed.includes(element));
+  if(invalidFields.length>0) 
+      return next(new AppError(`You are not allowed to update the field(s): '${invalidFields.join(', ')}'.`, 400));
+
+
   if(password){
       if (!passwordConfirm){
         return next(new AppError("Please confirm your password!", 400))
