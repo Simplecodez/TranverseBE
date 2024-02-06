@@ -7,7 +7,8 @@ import {
   forgotPassword,
   resetPassword,
   getMe,
-  protect
+  protect,
+  updateAccount
 } from '../controllers/authController.js';
 
 const router = express.Router();
@@ -19,7 +20,7 @@ router.get('/signout', signout);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 router.use(protect)
+router.post('/settings', updateAccount)
 router.get('/me', getMe);
-
 
 export default router;

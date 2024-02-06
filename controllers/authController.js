@@ -7,6 +7,7 @@ import Email from "../utils/email.js";
 import AppError from "../utils/appError.js";
 import { createSendToken } from "../utils/jwt.utils.js";
 import { licenceNumberGenerator } from "../utils/helperFun.js";
+import { nextTick } from "process";
 
 const signup = catchAsync(async (req, res, next) => {
   const { licence, hashedLicence } = licenceNumberGenerator();
@@ -184,4 +185,41 @@ const resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, " Password reset was successful.", req, res);
 });
 
-export { signup, signin, activateAccount, protect, restrictTo, signout, forgotPassword, resetPassword, getMe};
+
+const updateAccount = catchAsync(async (req, res, next)=>{
+  const user = await User.findById(req.user._id).select('+password');
+  const {companyName, passwordCurrent, password, passwordConfirm} = req.body;
+  if(password){
+      if (!passwordConfirm){
+        return next(new AppError("Please confirm your password!", 400))
+      }
+      if (!passwordCurrent){
+        return next(new AppError("Please provide your current password!", 400))
+      }
+      if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+        return next(new AppError('Your current password is wrong.', 401));
+      }
+      user.password = password;
+      user.passwordConfirm = passwordConfirm;
+  }
+
+  if (companyName){
+      user.companyName = companyName;
+  }
+  await user.save(); 
+
+  createSendToken(user, 200, 'Your account was updated successfully.', req, res);
+})
+
+export { 
+  signup, 
+  signin, 
+  activateAccount, 
+  protect, 
+  restrictTo, 
+  signout, 
+  forgotPassword, 
+  resetPassword, 
+  getMe,
+  updateAccount
+};

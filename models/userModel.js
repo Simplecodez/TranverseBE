@@ -113,4 +113,6 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
+
+
 export default mongoose.model('User', userSchema);
