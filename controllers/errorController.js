@@ -23,7 +23,7 @@ const sendError = (err, req, res) => {
     return res.status(err.statusCode).json({
       status: err.status,
       type: err.type,
-      message: err.message
+      message: err.message,
     });
   }
 };

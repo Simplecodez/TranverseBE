@@ -24,11 +24,14 @@ class Email {
   }
 
   async send(template, subject, licenceNumber) {
-    const html = pug.renderFile(path.join(currentDir, `../views/email/welcome.pug`), {
-      name: this.name,
-      licenceNumber,
-      subject
-    });
+    const html = pug.renderFile(
+      path.join(currentDir, `../views/email/${template}.pug`),
+      {
+        name: this.name,
+        licenceNumber,
+        subject
+      }
+    );
 
     const mailOptions = {
       from: this.from,
@@ -44,14 +47,21 @@ class Email {
     await this.send('Welcome', 'Welcome to Traverse!', licenceNumber);
   }
 
-   async sendProjectCreated(recipientEmail, projectName, url, subject) {
-    console.log(url)
-    const html = pug.renderFile(path.join(currentDir, `../views/email/projectCreated.pug`), {
-      name: this.name,
-      projectName,
-      subject,
-      url
-    });
+  async sendRequest() {
+    await this.send('requestMessage', 'Demo Request', 'vhghjjhk');
+  }
+
+  async sendProjectCreated(recipientEmail, projectName, url, subject) {
+    console.log(url);
+    const html = pug.renderFile(
+      path.join(currentDir, `../views/email/projectCreated.pug`),
+      {
+        name: this.name,
+        projectName,
+        subject,
+        url
+      }
+    );
 
     const mailOptions = {
       from: this.from,
@@ -64,11 +74,14 @@ class Email {
   }
 
   async sendUserProject(projectName, subject) {
-    const html = pug.renderFile(path.join(currentDir, `../views/email/userCreatedProject.pug`), {
-      name: this.name,
-      projectName,
-      subject
-    });
+    const html = pug.renderFile(
+      path.join(currentDir, `../views/email/userCreatedProject.pug`),
+      {
+        name: this.name,
+        projectName,
+        subject
+      }
+    );
 
     const mailOptions = {
       from: this.from,
@@ -81,20 +94,22 @@ class Email {
   }
 
   async sendResetToken(resetToken) {
-    const html = pug.renderFile(path.join(currentDir, `../views/email/resetToken.pug`), {
-      resetToken
-    });
+    const html = pug.renderFile(
+      path.join(currentDir, `../views/email/resetToken.pug`),
+      {
+        resetToken
+      }
+    );
 
     const mailOptions = {
       from: this.from,
       to: this.to,
-      subject: "Reset token",
+      subject: 'Reset token',
       html,
       text: htmlToText.fromString(html)
     };
     await this.newTransport().sendMail(mailOptions);
   }
-
 }
 
 export default Email;

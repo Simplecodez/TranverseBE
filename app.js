@@ -4,13 +4,14 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import xss from 'xss-clean'
+import xss from 'xss-clean';
 import mongoSanitize from 'express-mongo-sanitize';
 
 import globalErrorHandler from './controllers/errorController.js';
 import AppError from './utils/appError.js';
-import projectRoutes from './routes/projectRoutes.js'
-import calenderRoutes from "./routes/calenderRoutes.js";
+import projectRoutes from './routes/projectRoutes.js';
+import calenderRoutes from './routes/calenderRoutes.js';
+import demoRoutes from './routes/demoRoutes.js';
 
 const app = express();
 app.use(helmet());
@@ -40,10 +41,10 @@ app.get('/', (req, res) => {
   res.send('welcome to TraverseBE');
 });
 
-
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/project', projectRoutes);
 app.use('/api/v1/calendar', calenderRoutes);
+app.use('/api/v1/request', demoRoutes);
 app.use('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
