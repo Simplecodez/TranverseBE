@@ -19,7 +19,7 @@ const signup = catchAsync(async (req, res, next) => {
     companyName,
     website,
     password,
-    passwordConfirm,
+    passwordConfirm
   };
   newUser.licence = hashedLicence;
   const user = await User.create(newUser);
@@ -29,7 +29,7 @@ const signup = catchAsync(async (req, res, next) => {
     return res.status(201).json({
       status: 'success',
       message:
-        'Signup successful, kindly check your email for your Licence Number.',
+        'Signup successful, kindly check your email for your Licence Number.'
     });
   } catch (err) {
     await User.deleteOne({ email: req.body.email });
@@ -43,7 +43,7 @@ const activateAccount = catchAsync(async (req, res, next) => {
     .update(req.body.licence)
     .digest('hex');
   const user = await User.findOne({
-    licence: hashedLicence,
+    licence: hashedLicence
   });
   if (!user) {
     return next(new AppError('Invalid Licence Number', 400));
@@ -127,14 +127,14 @@ const protect = catchAsync(async (req, res, next) => {
 const getMe = (req, res) => {
   res.status(200).json({
     status: 'success',
-    user: req.user,
+    user: req.user
   });
 };
 
 const signout = (req, res) => {
   res.cookie('jwt', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
+    httpOnly: true
   });
   res.status(200).json({ message: 'Logged out successfully' });
 };
@@ -157,12 +157,12 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   try {
     await new Email({
       name: 'Candidate',
-      email: req.body.email,
+      email: req.body.email
     }).sendResetToken(resetToken);
 
     res.status(200).json({
       status: 'success',
-      message: 'Token sent to email',
+      message: 'Token sent to email'
     });
   } catch (err) {
     user.passwordResetToken = undefined;
@@ -185,7 +185,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
     .digest('hex');
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
+    passwordResetExpires: { $gt: Date.now() }
   });
 
   // 2) if token has not expired, and there is a user, set the new password
@@ -212,7 +212,7 @@ const updateAccount = catchAsync(async (req, res, next) => {
     'companyName',
     'password',
     'passwordConfirm',
-    'passwordCurrent',
+    'passwordCurrent'
   ];
   const postedFields = Object.keys(req.body);
   const invalidFields = postedFields.filter(
@@ -270,5 +270,5 @@ export {
   forgotPassword,
   resetPassword,
   getMe,
-  updateAccount,
+  updateAccount
 };

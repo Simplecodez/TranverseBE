@@ -9,9 +9,12 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please tell us your name!'],
     validate: {
       validator: (value) => {
-        return validator.isLength(value, { min: 3, max: 50 })&&validator.matches(value, /^[a-zA-Z\s]+$/)
+        return (
+          validator.isLength(value, { min: 3, max: 50 }) &&
+          validator.matches(value, /^[a-zA-Z\s]+$/)
+        );
       },
-      message: 'Please your name must be 3 or more characters.',
+      message: 'Please your name must be 3 or more characters.'
     }
   },
   email: {
@@ -26,10 +29,14 @@ const userSchema = new mongoose.Schema({
     required: false,
     validate: {
       validator: (value) => {
-        return validator.isLength(value, { min: 3, max: 50 })&&validator.matches(value, /^[a-zA-Z0-9\s]+$/);
+        return (
+          validator.isLength(value, { min: 3, max: 50 }) &&
+          validator.matches(value, /^[a-zA-Z0-9\s]+$/)
+        );
       },
-      message: 'Invalid company name, Only Alphanumeric characters and "," are allowed',
-    },
+      message:
+        'Invalid company name, Only Alphanumeric characters and "," are allowed'
+    }
   },
   website: {
     type: String,
@@ -38,8 +45,8 @@ const userSchema = new mongoose.Schema({
       validator: (value) => {
         return validator.isURL(value, { require_protocol: false });
       },
-      message: 'Invalid website URL',
-    },
+      message: 'Invalid website URL'
+    }
   },
   password: {
     type: String,
@@ -51,7 +58,7 @@ const userSchema = new mongoose.Schema({
       validator: function (value) {
         return value === this.password;
       },
-      message: 'Passwords are not the same'
+      message: 'Passwords are not the same.'
     }
   },
   role: {
@@ -74,7 +81,7 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpires: Date,
+  passwordResetExpires: Date
 });
 
 userSchema.pre('save', async function (next) {
@@ -99,20 +106,23 @@ userSchema.methods.correctPassword = async function (
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
     return JWTTimestamp < changedTimestamp;
   }
   return false;
 };
 
-
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
-
-
 
 export default mongoose.model('User', userSchema);
