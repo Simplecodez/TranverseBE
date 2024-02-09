@@ -23,7 +23,7 @@ const limiter = rateLimit({
 //You this to affect only the /api routes
 
 const allowedOrigins = [
-  'https://traverse-eight.vercel.app',
+  'https://traversemob.vercel.app/',
   'http://localhost:3000'
 ];
 
