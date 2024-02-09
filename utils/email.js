@@ -44,7 +44,7 @@ class Email {
   }
 
   async sendWelcome(licenceNumber) {
-    await this.send('Welcome', 'Welcome to Traverse!', licenceNumber);
+    await this.send('welcome', 'Welcome to Traverse!', licenceNumber);
   }
 
   async sendRequest() {
