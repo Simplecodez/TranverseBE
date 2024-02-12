@@ -12,6 +12,7 @@ import AppError from './utils/appError.js';
 import projectRoutes from './routes/projectRoutes.js';
 import calenderRoutes from './routes/calenderRoutes.js';
 import demoRoutes from './routes/demoRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 app.use(helmet());
@@ -42,6 +43,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/project', projectRoutes);
 app.use('/api/v1/calendar', calenderRoutes);
 app.use('/api/v1/request', demoRoutes);
