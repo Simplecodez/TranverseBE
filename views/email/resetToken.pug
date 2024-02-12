@@ -1,10 +1,17 @@
 extends baseEmail 
 
-block content 
+block content
     p Hi there,
-    p This is your reset password link:  #{resetToken}
-
-    
+    p Click on the button below to reset your password.
+    p If you didn't initiate this kindly ignore.
+    table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+        tbody
+            tr
+                td(align='left')
+                    table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+                        tbody
+                            tr
+                                td
+                                    a(href=`${resetURL}`, target='_blank') Accept
     p For questions and enquiries you can reach us via-
     p email: help@traverse.com
-        

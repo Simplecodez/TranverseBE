@@ -93,11 +93,11 @@ class Email {
     await this.newTransport().sendMail(mailOptions);
   }
 
-  async sendResetToken(resetToken) {
+  async sendResetToken(resetURL) {
     const html = pug.renderFile(
       path.join(currentDir, `../views/email/resetToken.pug`),
       {
-        resetToken
+        resetURL
       }
     );
 
