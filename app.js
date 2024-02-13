@@ -1,3 +1,5 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
@@ -41,7 +43,9 @@ app.use(xss());
 app.get('/', (req, res) => {
   res.send('welcome to TraverseBE');
 });
-
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+console.log(currentDir);
+app.use('/dp', express.static(path.join(currentDir, '/public/img/users')));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/project', projectRoutes);

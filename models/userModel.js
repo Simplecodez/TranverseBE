@@ -24,6 +24,18 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email!']
   },
+  bio: {
+    type: String,
+    validate: {
+      validator: (value) => {
+        return (
+          validator.isLength(value, { min: 3, max: 50 }) &&
+          validator.matches(value, /^[a-zA-Z\s]+$/)
+        );
+      },
+      message: 'Please your name must be 3 or more characters.'
+    }
+  },
   companyName: {
     type: String,
     required: false,
@@ -48,6 +60,7 @@ const userSchema = new mongoose.Schema({
       message: 'Invalid website URL'
     }
   },
+  photo: String,
   password: {
     type: String,
     select: false

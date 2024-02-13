@@ -22,30 +22,11 @@ const createProject = catchAsync(async (req, res, next) => {
     endDate: mongoEndDate,
     owner: req.user._id
   };
-
   const project = await Project.create(newProject);
   project.email = req.user.email;
   project.name = req.user.name;
   const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
-  try {
-    const promiseAsync = teamMembers.map((email) =>
-      new Email(project).sendProjectCreated(
-        email,
-        project.title,
-        url,
-        "You've been invited to join a project on Traverse."
-      )
-    );
-    const userProjectPromise = new Email(project).sendUserProject(
-      project.title,
-      'Successful project creation!'
-    );
-    const totalPromise = [...promiseAsync, userProjectPromise];
-    await Promise.all(totalPromise);
-  } catch (err) {
-    await Project.deleteOne({ _id: project._id });
-    return next(err);
-  }
+  await emailingPromise(Project, url, teamMembers, project, 'create', Email);
   res.status(200).json({
     status: 'success',
     project

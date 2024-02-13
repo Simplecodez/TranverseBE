@@ -211,61 +211,6 @@ const resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, ' Password reset was successful.', req, res);
 });
 
-const updateAccount = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id).select('+password');
-  const { companyName, passwordCurrent, password, passwordConfirm } = req.body;
-  const fieldsAllowed = [
-    'companyName',
-    'password',
-    'passwordConfirm',
-    'passwordCurrent'
-  ];
-  const postedFields = Object.keys(req.body);
-  const invalidFields = postedFields.filter(
-    (element) => !fieldsAllowed.includes(element)
-  );
-
-  if (invalidFields.length > 0)
-    return next(
-      new AppError(
-        `You are not allowed to update the field(s): '${invalidFields.join(
-          ', '
-        )}'.`,
-        400
-      )
-    );
-
-  if (password) {
-    if (!passwordConfirm) {
-      return next(new AppError('Please confirm your password!', 400));
-    }
-    if (!passwordCurrent) {
-      return next(new AppError('Please provide your current password!', 400));
-    }
-    if (
-      !(await user.correctPassword(req.body.passwordCurrent, user.password))
-    ) {
-      return next(new AppError('Your current password is wrong.', 401));
-    }
-    user.password = password;
-    user.passwordConfirm = passwordConfirm;
-  }
-
-  if (companyName) {
-    user.companyName = companyName;
-  }
-
-  await user.save();
-
-  createSendToken(
-    user,
-    200,
-    'Your account was updated successfully.',
-    req,
-    res
-  );
-});
-
 export {
   signup,
   signin,
@@ -275,6 +220,5 @@ export {
   signout,
   forgotPassword,
   resetPassword,
-  getMe,
-  updateAccount
+  getMe
 };
