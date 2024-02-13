@@ -158,7 +158,7 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
   // 3. Send it to user's email
-  const resetURL = `https://traversemob.vercel.app/auth/accountid/reset?token=${resetToken}`;
+  const resetURL = `https://traversemob.vercel.app/auth/reset?token=${resetToken}`;
 
   try {
     await new Email({

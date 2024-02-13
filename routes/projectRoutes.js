@@ -7,14 +7,16 @@ import {
   updateProjectStatus,
   deleteProject,
   getOne,
-  assignTasks
+  assignTasks,
+  updateProjectTeamMembers
 } from '../controllers/projectController.js';
 
 const router = express.Router();
 router.use(protect);
 router.route('/').get(getAll).post(createProject);
 router.get('/accept', acceptProject);
-router.patch('/assignTask/:id', assignTasks);
+router.patch('/:id/assignTask', assignTasks);
+router.post('/:id/addMember', updateProjectTeamMembers);
 router
   .route('/:id')
   .get(getOne)

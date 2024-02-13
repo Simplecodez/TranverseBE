@@ -52,7 +52,6 @@ class Email {
   }
 
   async sendProjectCreated(recipientEmail, projectName, url, subject) {
-    console.log(url);
     const html = pug.renderFile(
       path.join(currentDir, `../views/email/projectCreated.pug`),
       {
@@ -73,13 +72,12 @@ class Email {
     await this.newTransport().sendMail(mailOptions);
   }
 
-  async sendUserProject(projectName, subject) {
+  async sendUserProject(message, subject) {
     const html = pug.renderFile(
       path.join(currentDir, `../views/email/userCreatedProject.pug`),
       {
         name: this.name,
-        projectName,
-        subject
+        message
       }
     );
 
