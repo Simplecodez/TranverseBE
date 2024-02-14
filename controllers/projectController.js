@@ -6,12 +6,14 @@ import Email from '../utils/email.js';
 import { emailingPromise } from '../utils/helperFun.js';
 
 const createProject = catchAsync(async (req, res, next) => {
-  const { title, description, teamMembers, startDate, endDate, price } =
-    req.body;
+  const { title, description, teamMembers, startDate, endDate, price } = req.body;
   //'2022-02-15T12:30:00'
   const mongoStartDate = new Date(startDate);
   const mongoEndDate = new Date(endDate);
   const durationInMilliseconds = mongoEndDate - mongoStartDate;
+
+  if (durationInMilliseconds < 0)
+    return next(new AppError('Sorry, Start date cannot be later than End date!', 400));
   const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
   const newProject = {
     title,
@@ -36,8 +38,7 @@ const createProject = catchAsync(async (req, res, next) => {
 const updateProjectStatus = catchAsync(async (req, res, next) => {
   const { status } = req.body;
   const project = await Project.findOne({ _id: req.params.id });
-  if (!project)
-    return next(new AppError('Sorry, this project does not exist!', 400));
+  if (!project) return next(new AppError('Sorry, this project does not exist!', 400));
   if (project && project.owner !== req.user._id)
     return next(new AppError('Your are not authorized for this action!', 401));
   project.status = status;
@@ -116,8 +117,7 @@ const updateProjectTeamMembers = catchAsync(async (req, res, next) => {
   if (req.body.testError) {
     throw new Error('Intentional error for testing');
   }
-  if (!project)
-    return next(new AppError('Sorry, project does not exist.', 404));
+  if (!project) return next(new AppError('Sorry, project does not exist.', 404));
   project.name = req.user.name;
   project.email = req.user.email;
   const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
@@ -137,9 +137,7 @@ const assignTasks = catchAsync(async (req, res, next) => {
     active: true
   });
   if (!project) {
-    return next(
-      new AppError('Project not found, might have been deleted.', 404)
-    );
+    return next(new AppError('Project not found, might have been deleted.', 404));
   }
   const member = await User.findOne({ email, active: true });
   if (!member) return next(new AppError('This user does not exist!', 400));
