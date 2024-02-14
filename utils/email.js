@@ -23,24 +23,29 @@ class Email {
     });
   }
 
-  async send(template, subject, licenceNumber) {
+  async setOptionsAndSend(...args) {
     const html = pug.renderFile(
-      path.join(currentDir, `../views/email/${template}.pug`),
-      {
-        name: this.name,
-        licenceNumber,
-        subject
-      }
+      path.join(currentDir, `../views/email/${args[2]}.pug`),
+      args[1]
     );
-
     const mailOptions = {
       from: this.from,
-      to: this.to,
-      subject,
+      to: args[3] ? args[3] : this.to,
+      subject: args[0],
       html,
       text: htmlToText.fromString(html)
     };
+
     await this.newTransport().sendMail(mailOptions);
+  }
+
+  async send(template, subject, licenceNumber) {
+    const pubObject = {
+      name: this.name,
+      licenceNumber,
+      subject
+    };
+    await this.setOptionsAndSend(subject, pubObject, template);
   }
 
   async sendWelcome(licenceNumber) {
@@ -51,62 +56,30 @@ class Email {
     await this.send('requestMessage', 'Demo Request', 'vhghjjhk');
   }
 
-  async sendProjectCreated(recipientEmail, projectName, url, subject) {
-    const html = pug.renderFile(
-      path.join(currentDir, `../views/email/projectCreated.pug`),
-      {
-        name: this.name,
-        projectName,
-        subject,
-        url
-      }
-    );
-
-    const mailOptions = {
-      from: this.from,
-      to: recipientEmail,
-      subject,
-      html,
-      text: htmlToText.fromString(html)
-    };
-    await this.newTransport().sendMail(mailOptions);
-  }
-
   async sendUserProject(message, subject) {
-    const html = pug.renderFile(
-      path.join(currentDir, `../views/email/userCreatedProject.pug`),
-      {
-        name: this.name,
-        message
-      }
-    );
-
-    const mailOptions = {
-      from: this.from,
-      to: this.to,
-      subject,
-      html,
-      text: htmlToText.fromString(html)
+    const pubObject = {
+      name: this.name,
+      message
     };
-    await this.newTransport().sendMail(mailOptions);
+    await this.setOptionsAndSend(subject, pubObject, 'userCreatedProject');
   }
 
   async sendResetToken(resetURL) {
-    const html = pug.renderFile(
-      path.join(currentDir, `../views/email/resetToken.pug`),
-      {
-        resetURL
-      }
-    );
-
-    const mailOptions = {
-      from: this.from,
-      to: this.to,
-      subject: 'Reset token',
-      html,
-      text: htmlToText.fromString(html)
+    const pubObject = {
+      resetURL
     };
-    await this.newTransport().sendMail(mailOptions);
+    await this.setOptionsAndSend(subject, pubObject, 'resetToken');
+  }
+
+  async sendProjectCreated(recipientEmail, projectName, url, subject) {
+    const pubObject = {
+      name: this.name,
+      projectName,
+      subject,
+      url
+    };
+
+    await this.setOptionsAndSend(subject, pubObject, 'projectCreated', recipientEmail);
   }
 }
 

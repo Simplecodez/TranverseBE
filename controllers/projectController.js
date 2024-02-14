@@ -4,7 +4,6 @@ import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
 import Email from '../utils/email.js';
 import { emailingPromise } from '../utils/helperFun.js';
-import { protect } from './authController.js';
 
 const createProject = catchAsync(async (req, res, next) => {
   const { title, description, teamMembers, startDate, endDate, price } =
@@ -37,7 +36,6 @@ const createProject = catchAsync(async (req, res, next) => {
 const updateProjectStatus = catchAsync(async (req, res, next) => {
   const { status } = req.body;
   const project = await Project.findOne({ _id: req.params.id });
-
   if (!project)
     return next(new AppError('Sorry, this project does not exist!', 400));
   if (project && project.owner !== req.user._id)
@@ -104,7 +102,7 @@ const deleteProject = catchAsync(async (req, res, next) => {
   await project.save();
   res.status(204).json({
     status: 'success',
-    message: `You have successfully deleted the ${project.projectName}.`
+    message: `You have successfully deleted the ${project.title}.`
   });
 });
 
@@ -146,14 +144,12 @@ const assignTasks = catchAsync(async (req, res, next) => {
   const member = await User.findOne({ email, active: true });
   if (!member) return next(new AppError('This user does not exist!', 400));
   const result = project.teamMembers.find((mem) => mem.user === member._id);
-
   if (!result) {
     next(new AppError('The user is not a member of the project yet.', 400));
   }
   task.assignedTo = member._id;
   project.tasks.push(task);
   await project.save();
-
   try {
     await new Email({ email, name }).sendProjectCreated(
       email,
@@ -165,7 +161,6 @@ const assignTasks = catchAsync(async (req, res, next) => {
     await Project.deleteOne({ _id: project._id });
     return next(error);
   }
-
   res.status(200).json({
     status: 'success',
     message: 'Task has been assigned successfully.'

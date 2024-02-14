@@ -35,7 +35,7 @@ const emailingPromise = async (
       );
     });
     const userProjectPromise = new Email(project).sendUserProject(
-      `You have successfully sent invite for ${project.projectName} project was successfully created!`,
+      `You have successfully sent invite for ${project.title} project.`,
       'Invites success!'
     );
     const totalPromise = [...emailPromise, userProjectPromise];
