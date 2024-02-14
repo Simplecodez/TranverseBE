@@ -39,13 +39,13 @@ class Email {
     await this.newTransport().sendMail(mailOptions);
   }
 
-  async send(template, subject, licenceNumber) {
+  async send(...args) {
     const pubObject = {
       name: this.name,
-      licenceNumber,
-      subject
+      licenceNumber: args[2],
+      subject: args[1]
     };
-    await this.setOptionsAndSend(subject, pubObject, template);
+    await this.setOptionsAndSend(args[1], pubObject, args[0]);
   }
 
   async sendWelcome(licenceNumber) {
@@ -53,7 +53,7 @@ class Email {
   }
 
   async sendRequest() {
-    await this.send('requestMessage', 'Demo Request', 'vhghjjhk');
+    await this.send('requestMessage', 'Demo Request');
   }
 
   async sendUserProject(message, subject) {
