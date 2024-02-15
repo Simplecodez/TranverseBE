@@ -8,15 +8,18 @@ import {
   deleteProject,
   getOne,
   assignTasks,
-  updateProjectTeamMembers
+  updateProjectTeamMembers,
+  declineProject
 } from '../controllers/projectController.js';
 
 const router = express.Router();
 router.use(protect);
 router.route('/').get(getAll).post(createProject);
 router.get('/accept', acceptProject);
+router.get('/decline', declineProject);
 router.patch('/:id/assignTask', assignTasks);
 router.post('/:id/addMember', updateProjectTeamMembers);
+
 router
   .route('/:id')
   .get(getOne)

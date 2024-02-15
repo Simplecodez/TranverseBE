@@ -165,6 +165,29 @@ const assignTasks = catchAsync(async (req, res, next) => {
   });
 });
 
+const declineProject = catchAsync(async (req, res, next) => {
+  console.log(req.originalUrl);
+  const { id } = req.query;
+  const project = await Project.findById(id);
+  const { email, name } = await User.findById(project.owner);
+
+  try {
+    await new Email({ email, name }).sendDeclineProject(
+      `${req.user.name.split(' ')[0]} declined the offer to work on ${
+        project.title
+      } project.`,
+      'Invite declined'
+    );
+  } catch (error) {
+    await Project.deleteOne({ _id: project._id });
+    return next(error);
+  }
+  res.status(200).json({
+    status: 'success',
+    message: `You declined the ${project.title} project offer from ${name}.`
+  });
+});
+
 export {
   createProject,
   acceptProject,
@@ -173,5 +196,6 @@ export {
   getAll,
   deleteProject,
   assignTasks,
-  updateProjectTeamMembers
+  updateProjectTeamMembers,
+  declineProject
 };

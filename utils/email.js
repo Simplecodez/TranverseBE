@@ -81,6 +81,14 @@ class Email {
 
     await this.setOptionsAndSend(subject, pubObject, 'projectCreated', recipientEmail);
   }
+
+  async sendDeclineProject(message, subject) {
+    const pubObject = {
+      name: this.name,
+      message
+    };
+    await this.setOptionsAndSend(subject, pubObject, 'userCreatedProject');
+  }
 }
 
 export default Email;
