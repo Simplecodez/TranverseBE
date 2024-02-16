@@ -4,6 +4,7 @@ import AppError from '../utils/appError.js';
 import catchAsync from '../utils/catchAsync.js';
 import Email from '../utils/email.js';
 import { emailingPromise } from '../utils/helperFun.js';
+import { createNotification } from '../controllers/notificationController.js';
 
 const createProject = catchAsync(async (req, res, next) => {
   const { title, description, teamMembers, startDate, endDate, price } = req.body;
@@ -53,10 +54,26 @@ const acceptProject = catchAsync(async (req, res, next) => {
   const userID = req.user._id;
   const projectID = req.query.id;
   const project = await Project.findOne({ _id: projectID });
-  const member = { user: userID };
+
+  // Check if the user is already a member of the project
+  const isMember = project.teamMembers.some(member => member.user.equals(userID));
+  if (isMember) {
+    return next(new AppError('You are already a member of this project.', 400));
+  }
+
+  const member = {
+    user: userID,
+    role: 'member' // or 'team-lead' based on your requirements
+  };
 
   project.teamMembers.push(member);
   await project.save();
+
+  // Create a notification for the project owner
+  const owner = await User.findById(project.owner);
+  const message = `${req.user.name} accepted the invitation to join ${project.title} project.`;
+  await createNotification(owner, project, message);
+
   res.status(200).json({
     status: 'success',
     message: `You have accepted to join the ${project.title} project.`

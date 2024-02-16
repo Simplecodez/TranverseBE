@@ -15,6 +15,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import calenderRoutes from './routes/calenderRoutes.js';
 import demoRoutes from './routes/demoRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 const app = express();
 app.use(helmet());
@@ -51,6 +52,7 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/project', projectRoutes);
 app.use('/api/v1/calendar', calenderRoutes);
 app.use('/api/v1/request', demoRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 app.use('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
