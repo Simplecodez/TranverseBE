@@ -21,7 +21,7 @@ const projectSchema = new mongoose.Schema({
     validate: {
       validator: (value) => {
         return (
-          validator.isLength(value, { min: 3, max: 50 }) &&
+          validator.isLength(value, { min: 3, max: 500 }) &&
           validator.matches(value, /^[a-zA-Z\s.]+$/)
         );
       },
