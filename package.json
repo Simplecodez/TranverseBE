@@ -13,6 +13,7 @@
     "mongoose": "^8.1.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.8",
+    "nodemon": "^3.0.3",
     "otp-generator": "^4.0.1",
     "pug": "^3.0.2",
     "sharp": "^0.33.2",
@@ -25,7 +26,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node server"
+    "start": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
