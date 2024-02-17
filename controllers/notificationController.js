@@ -1,14 +1,15 @@
 import Notification from '../models/notificationModel.js';
 import catchAsync from '../utils/catchAsync.js';
 
-const createNotification = catchAsync(async (user, project, message) => {
-  await Notification.create({ user: user._id, project, message });
-})
+const createNotification = async (user, type, message) => {
+  await Notification.create({ user: user._id, notification_type: type, message });
+};
 
 const getNotifications = catchAsync(async (req, res, next) => {
-  const notifications = await Notification.find({ user: req.user._id })
-    .populate('project')
-    .sort('-createdAt');
+  console.log(req.user.name, req.user._id);
+  const notifications = await Notification.find({ user: req.user._id }).sort({
+    createAt: -1
+  });
 
   res.status(200).json({
     status: 'success',

@@ -26,6 +26,18 @@ const createProject = catchAsync(async (req, res, next) => {
     owner: req.user._id
   };
   const project = await Project.create(newProject);
+  if (teamMembers.length > 0) {
+    const users = await User.find({ email: { $in: teamMembers } }, { _id: 1 }).lean();
+    const notificationPromise = users.map((user) =>
+      createNotification(
+        user._id,
+        'invite',
+        `You got an invite from ${req.user.name} to collaborate on ${title} `
+      )
+    );
+    await Promise.all(notificationPromise);
+  }
+
   project.email = req.user.email;
   project.name = req.user.name;
   const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
@@ -44,6 +56,18 @@ const updateProjectStatus = catchAsync(async (req, res, next) => {
     return next(new AppError('Your are not authorized for this action!', 401));
   project.status = status;
   await project.save();
+
+  if (project.teamMembers.length > 0) {
+    const notificationPromise = project.teamMembers.map((id) =>
+      createNotification(
+        id,
+        'status',
+        `The status of ${project.title} has been updated, take a look.`
+      )
+    );
+    await Promise.all(notificationPromise);
+  }
+
   res.status(200).json({
     status: 'success',
     message: `You have updated project status to ${status}.`
@@ -56,7 +80,7 @@ const acceptProject = catchAsync(async (req, res, next) => {
   const project = await Project.findOne({ _id: projectID });
 
   // Check if the user is already a member of the project
-  const isMember = project.teamMembers.some(member => member.user.equals(userID));
+  const isMember = project.teamMembers.some((member) => member.user.equals(userID));
   if (isMember) {
     return next(new AppError('You are already a member of this project.', 400));
   }
@@ -70,9 +94,11 @@ const acceptProject = catchAsync(async (req, res, next) => {
   await project.save();
 
   // Create a notification for the project owner
-  const owner = await User.findById(project.owner);
-  const message = `${req.user.name} accepted the invitation to join ${project.title} project.`;
-  await createNotification(owner, project, message);
+  await createNotification(
+    project.owner,
+    'accepted',
+    `${req.user.name} has accepted your request to collaborate on ${project.title} `
+  );
 
   res.status(200).json({
     status: 'success',
@@ -138,6 +164,19 @@ const updateProjectTeamMembers = catchAsync(async (req, res, next) => {
   project.name = req.user.name;
   project.email = req.user.email;
   const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
+
+  if (teamMembers.length > 0) {
+    const users = await User.find({ email: { $in: teamMembers } }, { _id: 1 }).lean();
+    const notificationPromise = users.map((user) =>
+      createNotification(
+        user._id,
+        'invite',
+        `You got an invite from ${req.user.name} to collaborate on ${title} `
+      )
+    );
+    await Promise.all(notificationPromise);
+  }
+
   await emailingPromise(Project, url, teamMembers, project, 'update', Email);
   res.status(200).json({
     status: 'success',
@@ -164,7 +203,16 @@ const assignTasks = catchAsync(async (req, res, next) => {
   }
   task.assignedTo = member._id;
   project.tasks.push(task);
-  await project.save();
+
+  await Promise.all([
+    project.save(),
+    createNotification(
+      member._id,
+      'assigned',
+      `You've been assigned a task on ${project.title}.`
+    )
+  ]);
+
   try {
     await new Email({ email, name }).sendProjectCreated(
       email,
@@ -173,7 +221,8 @@ const assignTasks = catchAsync(async (req, res, next) => {
       `${req.user.name} assigned ${task.title} task to you on project - ${project.title}`
     );
   } catch (error) {
-    await Project.deleteOne({ _id: project._id });
+    project.tasks.pop();
+    await project.save();
     return next(error);
   }
   res.status(200).json({
@@ -186,7 +235,13 @@ const declineProject = catchAsync(async (req, res, next) => {
   console.log(req.originalUrl);
   const { id } = req.query;
   const project = await Project.findById(id);
-  const { email, name } = await User.findById(project.owner);
+  const { _id, email, name } = await User.findById(project.owner);
+
+  await createNotification(
+    project.owner,
+    'declined',
+    `${name} declined your offer to join ${project.title}.`
+  );
 
   try {
     await new Email({ email, name }).sendDeclineProject(
@@ -196,7 +251,6 @@ const declineProject = catchAsync(async (req, res, next) => {
       'Invite declined'
     );
   } catch (error) {
-    await Project.deleteOne({ _id: project._id });
     return next(error);
   }
   res.status(200).json({

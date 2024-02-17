@@ -7,19 +7,13 @@ const notificationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  project: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Project',
-    required: true
+  notification_type: {
+    type: String,
+    enum: ['invite', 'accepted', 'status', 'assigned', 'declined']
   },
   message: {
     type: String,
     required: true
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'accepted', 'declined'],
-    default: 'pending'
   },
   createdAt: {
     type: Date,
