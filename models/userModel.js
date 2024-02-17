@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator: (value) => {
         return (
-          validator.isLength(value, { min: 3, max: 50 }) &&
+          validator.isLength(value, { min: 3, max: 500 }) &&
           validator.matches(value, /^[a-zA-Z\s]+$/)
         );
       },
@@ -46,8 +46,7 @@ const userSchema = new mongoose.Schema({
           validator.matches(value, /^[a-zA-Z0-9\s]+$/)
         );
       },
-      message:
-        'Invalid company name, Only Alphanumeric characters and "," are allowed'
+      message: 'Invalid company name, Only Alphanumeric characters and "," are allowed'
     }
   },
   website: {
@@ -110,19 +109,13 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  ownerPassword
-) {
+userSchema.methods.correctPassword = async function (candidatePassword, ownerPassword) {
   return await bcrypt.compare(candidatePassword, ownerPassword);
 };
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
-      10
-    );
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
     return JWTTimestamp < changedTimestamp;
   }
   return false;
@@ -130,10 +123,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
