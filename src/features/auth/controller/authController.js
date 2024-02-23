@@ -1,17 +1,16 @@
 import crypto from 'crypto';
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel.js';
-import catchAsync from '../utils/catchAsync.js';
-import Email from '../utils/email.js';
-import AppError from '../utils/appError.js';
-import { createSendToken } from '../utils/jwt.utils.js';
-import { licenceNumberGenerator } from '../utils/helperFun.js';
+import User from '../../../models/userModel.js';
+import catchAsync from '../../../utils/catchAsync.js';
+import Email from '../../../utils/email.js';
+import AppError from '../../../utils/appError.js';
+import { createSendToken } from '../../../utils/jwt.utils.js';
+import { licenceNumberGenerator } from '../../../utils/helperFun.js';
 
 const signup = catchAsync(async (req, res, next) => {
   const { licence, hashedLicence } = licenceNumberGenerator();
-  const { name, email, companyName, website, password, passwordConfirm } =
-    req.body;
+  const { name, email, companyName, website, password, passwordConfirm } = req.body;
 
   const newUser = {
     name,
@@ -28,8 +27,7 @@ const signup = catchAsync(async (req, res, next) => {
     await new Email(user).sendWelcome(licence);
     return res.status(201).json({
       status: 'success',
-      message:
-        'Signup successful, kindly check your email for your Licence Number.'
+      message: 'Signup successful, kindly check your email for your Licence Number.'
     });
   } catch (err) {
     await User.deleteOne({ email: req.body.email });
@@ -79,9 +77,7 @@ const restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles ['admin','user' 'team-lead']. role = 'user'
     if (!roles.includes(req.user.role)) {
-      return next(
-        new AppError('You do have permission to perform this action!', 403)
-      );
+      return next(new AppError('You do have permission to perform this action!', 403));
     }
     next();
   };
@@ -89,13 +85,14 @@ const restrictTo = (...roles) => {
 
 const protect = catchAsync(async (req, res, next) => {
   // get token and check if it exist
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    token = req.headers.authorization.split(' ')[1];
-  }
+  let token = req.cookies.jwt;
+  // if (
+  //   req.headers.authorization &&
+  //   req.headers.authorization.startsWith('Bearer')
+  // ) {
+  //   token = req.headers.authorization.split(' ')[1];
+  // }
+
   if (!token) {
     return next(
       new AppError('Your are not logged in! Please log in to get access.', 401)
@@ -175,20 +172,14 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
     return next(
-      new AppError(
-        'There was an error sending the email. Try again later!',
-        500
-      )
+      new AppError('There was an error sending the email. Try again later!', 500)
     );
   }
 });
 
 const resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
-  const hashedToken = crypto
-    .createHash('sha256')
-    .update(req.params.token)
-    .digest('hex');
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
   const user = await User.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() }

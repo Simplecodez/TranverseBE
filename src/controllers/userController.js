@@ -61,8 +61,7 @@ const resizeUserPhoto = catchAsync(async (req, res, next) => {
 
 const updateAccount = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id).select('+password');
-  const { companyName, passwordCurrent, password, passwordConfirm, bio } =
-    req.body;
+  const { companyName, passwordCurrent, password, passwordConfirm, bio } = req.body;
   const fieldsAllowed = [
     'companyName',
     'password',
@@ -78,9 +77,7 @@ const updateAccount = catchAsync(async (req, res, next) => {
   if (invalidFields.length > 0)
     return next(
       new AppError(
-        `You are not allowed to update the field(s): '${invalidFields.join(
-          ', '
-        )}'.`,
+        `You are not allowed to update the field(s): '${invalidFields.join(', ')}'.`,
         400
       )
     );
@@ -92,9 +89,7 @@ const updateAccount = catchAsync(async (req, res, next) => {
     if (!passwordCurrent) {
       return next(new AppError('Please provide your current password!', 400));
     }
-    if (
-      !(await user.correctPassword(req.body.passwordCurrent, user.password))
-    ) {
+    if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
       return next(new AppError('Your current password is wrong.', 401));
     }
     user.password = password;
@@ -111,13 +106,7 @@ const updateAccount = catchAsync(async (req, res, next) => {
 
   await user.save();
 
-  createSendToken(
-    user,
-    200,
-    'Your account was updated successfully.',
-    req,
-    res
-  );
+  createSendToken(user, 200, 'Your account was updated successfully.', req, res);
 });
 
 export { userSearch, uploadUserPhoto, resizeUserPhoto, updateAccount };

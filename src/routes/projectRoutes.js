@@ -9,7 +9,8 @@ import {
   getOne,
   assignTasks,
   updateProjectTeamMembers,
-  declineProject
+  declineProject,
+  getTask
 } from '../controllers/projectController.js';
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.use(protect);
 router.route('/').get(getAll).post(createProject);
 router.get('/accept', acceptProject);
 router.get('/decline', declineProject);
+router.get('/tasks', getTask);
 router.patch('/:id/assignTask', assignTasks);
 router.post('/:id/addMember', updateProjectTeamMembers);
 

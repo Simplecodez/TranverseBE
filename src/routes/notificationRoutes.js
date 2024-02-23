@@ -1,6 +1,6 @@
 // notificationRoute.js
 import express from 'express';
-import { protect } from '../controllers/authController.js';
+import { protect } from '../features/auth/controller/authController.js';
 import { getNotifications } from '../controllers/notificationController.js';
 
 const router = express.Router();

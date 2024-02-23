@@ -2,9 +2,9 @@ import express from 'express';
 import {
   getCalenderData,
   getOne,
-  newCalender,
+  newCalender
 } from '../controllers/calenderController.js';
-import { protect } from '../controllers/authController.js';
+import { protect } from '../features/auth/controller/authController.js';
 
 const router = express.Router();
 

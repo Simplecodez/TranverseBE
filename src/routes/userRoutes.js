@@ -1,6 +1,6 @@
 import express from 'express';
 import { userSearch } from '../controllers/userController.js';
-import { protect } from '../controllers/authController.js';
+import { protect } from '../features/auth/controller/authController.js';
 
 const router = express.Router();
 router.use(protect);

@@ -13,7 +13,7 @@ import {
   resetPassword,
   getMe,
   protect
-} from '../controllers/authController.js';
+} from '../features/auth/controller/authController.js';
 
 const router = express.Router();
 

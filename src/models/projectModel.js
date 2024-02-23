@@ -101,6 +101,10 @@ const projectSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
     select: false
+  },
+  createAt: {
+    type: Date,
+    default: Date.now
   }
 });
 
