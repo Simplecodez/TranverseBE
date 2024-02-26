@@ -65,6 +65,9 @@ const projectSchema = new mongoose.Schema({
           type: mongoose.Schema.ObjectId,
           ref: 'User'
         },
+        dueDate: {
+          type: Date
+        },
         status: {
           type: String,
           enum: ['Todo', 'In Progress', 'Done'],

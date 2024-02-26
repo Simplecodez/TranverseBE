@@ -7,13 +7,14 @@ import Email from '../../../utils/email.js';
 import { createNotification } from '../../../controllers/notificationController.js';
 
 const assignTasks = catchAsync(async (req, res, next) => {
-  const { task, email, name } = req.body;
+  const { task, email, name, dueDate } = req.body;
   const projectID = req.params.id;
   const project = await Project.findOne({
     _id: projectID,
     owner: req.user._id,
     active: true
   });
+  if (!dueDate) return next(new AppError('Please provide a due date.', 400));
   if (!project) {
     return next(new AppError('Project not found, might have been deleted.', 404));
   }
@@ -26,6 +27,7 @@ const assignTasks = catchAsync(async (req, res, next) => {
     return next(new AppError('The user is not a member of the project yet.', 400));
   }
   task.assignedTo = member._id;
+  task.dueDate = dueDate;
   project.tasks.push(task);
 
   await Promise.all([
