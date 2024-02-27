@@ -85,13 +85,13 @@ const restrictTo = (...roles) => {
 
 const protect = catchAsync(async (req, res, next) => {
   // get token and check if it exist
-  let token = req.cookies.jwt;
-  //   if (
-  //    req.headers.authorization &&
-  //     req.headers.authorization.startsWith('Bearer')
-  //   ) {
-  //    token = req.headers.authorization.split(' ')[1];
-  //  }
+  // let token = req.cookies.jwt;
+    if (
+     req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+     ) {
+     token = req.headers.authorization.split(' ')[1];
+    }
 
   if (!token) {
     return next(
