@@ -1,3 +1,4 @@
+import { userSockets } from '../../socket.js';
 import Chat from '../models/chatModel.js';
 import User from '../models/userModel.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -11,7 +12,7 @@ const sendChat = catchAsync(async (req, res, next) => {
   const chat = new Chat({
     sender: senderId,
     receiver: receiverId,
-    message
+    message,
   });
 
   // Notify the receiver
@@ -19,15 +20,19 @@ const sendChat = catchAsync(async (req, res, next) => {
   const chatNotificationMessage = `New chat from ${req.user.name}`;
   await createNotification(receiver, 'chat', chatNotificationMessage);
 
-  // Emit the chat message through Socket.IO
-  req.app.get('io').emit('chat', chat);
+  // Emit the message to the recipient's socket
+  const receiverSocket = userSockets.get(receiverId);
+
+  if (receiverSocket) {
+    receiverSocket.emit('chat', chat);
+  }
 
   // Save the chat to the database
   chat.save();
 
   res.status(200).json({
     status: 'success',
-    chat
+    chat,
   });
 });
 
@@ -41,7 +46,7 @@ const getChats = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     count: chats.length,
-    chats
+    chats,
   });
 });
 
