@@ -8,7 +8,7 @@ const createNotification = async (user, type, message) => {
 const getNotifications = catchAsync(async (req, res, next) => {
   console.log(req.user.name, req.user._id);
   const notifications = await Notification.find({ user: req.user._id }).sort({
-    createAt: -1
+    createdAt: -1
   });
 
   res.status(200).json({
