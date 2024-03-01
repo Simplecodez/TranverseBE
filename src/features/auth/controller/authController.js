@@ -7,6 +7,7 @@ import Email from '../../../utils/email.js';
 import AppError from '../../../utils/appError.js';
 import { createSendToken } from '../../../utils/jwt.utils.js';
 import { licenceNumberGenerator } from '../../../utils/helperFun.js';
+import protectAux from '../auxFunctions/protect.js';
 
 const signup = catchAsync(async (req, res, next) => {
   const { licence, hashedLicence } = licenceNumberGenerator();
@@ -85,45 +86,14 @@ const restrictTo = (...roles) => {
 
 const protect = catchAsync(async (req, res, next) => {
   // get token and check if it exist
-  let token
-    if (
-     req.headers.authorization &&
-      req.headers.authorization.startsWith('Bearer')
-     ) {
-     token = req.headers.authorization.split(' ')[1];
-    }
+  const token = req.cookies.jwt;
+  // if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  //   token = req.headers.authorization.split(' ')[1];
+  // }
 
-  if (!token) {
-    return next(
-      new AppError('Your are not logged in! Please log in to get access.', 401)
-    );
-  }
-  // verification
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  //Attach the fresh user to the request
 
-  // check if user still exists
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
-    return next(
-      new AppError(
-        'This account no longer has access, please create a new account to gain access.',
-        401
-      )
-    );
-  }
-
-  if (freshUser.active === false)
-    return next(new AppError('Please activate your account to continue.', 401));
-
-  // check if user changed password after the token issued
-  if (freshUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError('User recently changed password! Please log in again.', 401)
-    );
-  }
-
-  //Grant access to protected route
-  req.user = freshUser;
+  req.user = await protectAux(token, next);
   next();
 });
 

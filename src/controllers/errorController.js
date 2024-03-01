@@ -24,16 +24,15 @@ const sendError = (err, req, res) => {
       type: err.type,
       message: err.message
     });
-  } else {
-    //Console.log the error
-    // console.log('ERROR!', err);
-    // console.error('error', err);
-    //Send generic message.
-    res.status(500).json({
-      status: 'error',
-      message: 'Something went very wrong!'
-    });
   }
+
+  //Log the error
+  // console.error('error', err);
+  //Send generic message.
+  return res.status(500).json({
+    status: 'error',
+    message: 'Something went very wrong!'
+  });
 };
 const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
