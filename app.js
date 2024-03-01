@@ -1,6 +1,9 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+
 import authRoutes from './src/routes/authRoutes.js';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
@@ -27,8 +30,8 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   message: 'Too many requests from this IP, please try again in an hour!'
 });
-//You this to affect only the /api routes
 
+// Use this to affect only the /api routes
 const allowedOrigins = ['https://traversemob.vercel.app/', 'http://localhost:3000'];
 
 const corsOptions = {
@@ -43,9 +46,15 @@ app.use(mongoSanitize());
 app.use(xss());
 app.use(compression());
 
+const server = http.createServer(app);
+const io = new Server(server);
+
+app.set('io', io);
+
 app.get('/', (req, res) => {
   res.send('welcome to TraverseBE');
 });
+
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 console.log(currentDir);
 app.use('/dp', express.static(path.join(currentDir, '/public/img/users')));
@@ -61,4 +70,6 @@ app.use('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 app.use(globalErrorHandler);
+
 export default app;
+export { server, io };

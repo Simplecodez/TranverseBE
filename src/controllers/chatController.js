@@ -19,6 +19,9 @@ const sendChat = catchAsync(async (req, res, next) => {
   const chatNotificationMessage = `New chat from ${req.user.name}`;
   await createNotification(receiver, 'chat', chatNotificationMessage);
 
+  // Pass the chat through Socket.IO
+  req.app.get('io').emit('chat', chat);
+
   res.status(200).json({
     status: 'success',
     chat
@@ -28,7 +31,7 @@ const sendChat = catchAsync(async (req, res, next) => {
 const getChats = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
 
-  // Find all chats where the user is either the sender or receiver
+  // Find all chats for both reciever and sender
   const chats = await Chat.find({ $or: [{ sender: userId }, { receiver: userId }] })
     .populate('sender', 'name')
     .populate('receiver', 'name');
