@@ -9,7 +9,6 @@ import helmet from 'helmet';
 import xss from 'xss-clean';
 import mongoSanitize from 'express-mongo-sanitize';
 import compression from 'compression';
-import { Server } from 'socket.io';
 
 import authRoutes from './src/routes/authRoutes.js';
 import globalErrorHandler from './src/controllers/errorController.js';
@@ -20,6 +19,7 @@ import demoRoutes from './src/routes/demoRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import notificationRoutes from './src/routes/notificationRoutes.js';
 import commentRoutes from './src/routes/commentRoutes.js';
+import initSocket from './src/features/chat/socket.js';
 
 const app = express();
 
@@ -30,7 +30,8 @@ const server = http.createServer(app, {
     origin: allowedOrigins
   }
 });
-const io = new Server(server);
+
+initSocket(server);
 
 app.use(helmet());
 const limiter = rateLimit({
@@ -68,11 +69,5 @@ app.use('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 app.use(globalErrorHandler);
-
-io.use(async (socket, next) => {
-  const token = socket.handshake.headers.authorization;
-  socket.user = await protectAux(token, next);
-  next();
-});
 
 export default server;

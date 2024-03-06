@@ -7,10 +7,7 @@ const commentSchema = new mongoose.Schema({
     required: [true, 'Please provide a comment.'],
     validate: {
       validator: (value) => {
-        return (
-          validator.isLength(value, { min: 3, max: 50 }) &&
-          validator.matches(value, /^[a-zA-Z\s]+$/)
-        );
+        return validator.isLength(value, { min: 3, max: 1000 });
       },
       message: 'Please your name must be 3 or more characters.'
     }

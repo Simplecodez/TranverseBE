@@ -16,6 +16,7 @@ class CommentController {
         project: id,
         commentBy: _id
       };
+
       await this.Model.create(data);
       res.status(200).json({
         status: 'success',
