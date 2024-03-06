@@ -26,7 +26,7 @@ class CommentController {
 
   get() {
     return catchAsync(async (req, res, next) => {
-      const comments = await this.Model.find({ project: req.params.id });
+      const comments = await this.Model.find({ project: req.params.id }).populate("commentBy");
       res.status(200).json({
         status: 'success',
         comments
