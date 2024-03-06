@@ -44,8 +44,11 @@ const projectSchema = new mongoose.Schema({
         role: {
           type: String,
           enum: ['team-lead', 'member'],
-          default: 'member',
-          required: true
+          default: 'member'
+        },
+        accepted: {
+          type: Boolean,
+          default: false
         }
       }
     ],

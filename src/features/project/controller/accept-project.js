@@ -11,18 +11,27 @@ const acceptProject = catchAsync(async (req, res, next) => {
   const project = await Project.findOne({ _id: projectID });
 
   // Check if the user is already a member of the project
-  const isMember = project.teamMembers.some((member) => member.user.equals(userID));
+  const isMember = project.teamMembers.some(
+    (member) => member.user.equals(userID) && member.accepted === true
+  );
   if (isMember) {
     return next(new AppError('You are already a member of this project.', 400));
   }
 
-  const member = {
-    user: userID,
-    role: 'member' // or 'team-lead' based on your requirements
-  };
-
-  project.teamMembers.push(member);
-  await project.save();
+  await Project.findOneAndUpdate(
+    {
+      _id: projectID,
+      'teamMembers.user': userID // Find the project by ID and matching user ID in teamMembers
+    },
+    {
+      $set: {
+        'teamMembers.$.accepted': true // Update accepted field to true for the matched user
+      }
+    },
+    {
+      new: true
+    }
+  );
 
   // Create a notification for the project owner
   await createNotification(

@@ -18,6 +18,31 @@ const createProject = catchAsync(async (req, res, next) => {
 
   const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
 
+  const users = await User.find(
+    { email: { $in: teamMembers } },
+    { _id: 1, email: 1 }
+  ).lean();
+
+  const foundEmails = users.map((user) => user.email);
+
+  const notFoundEmails = teamMembers.filter((email) => !foundEmails.includes(email));
+
+  if (notFoundEmails.length > 0)
+    return next(
+      new AppError(
+        `Sorry,the following email(s) are not linked to any account on Traverse yet: ${notFoundEmails.join(
+          ', '
+        )}`,
+        400
+      )
+    );
+
+  const addedTeamMember = users.map((userObj) => {
+    return {
+      user: userObj._id
+    };
+  });
+
   const newProject = {
     title,
     description,
@@ -25,13 +50,13 @@ const createProject = catchAsync(async (req, res, next) => {
     duration: durationInDays,
     startDate: mongoStartDate,
     endDate: mongoEndDate,
-    owner: req.user._id
+    owner: req.user._id,
+    teamMembers: addedTeamMember
   };
 
   const project = await Project.create(newProject);
 
   if (teamMembers.length > 0) {
-    const users = await User.find({ email: { $in: teamMembers } }, { _id: 1 }).lean();
     const notificationPromise = users.map((user) =>
       createNotification(
         user._id,
