@@ -114,6 +114,11 @@ const projectSchema = new mongoose.Schema({
   }
 });
 
+projectSchema.pre(/^find/, function (next) {
+  this.populate('teamMembers.user');
+  next();
+});
+
 const Project = mongoose.model('Project', projectSchema);
 
 export default Project;

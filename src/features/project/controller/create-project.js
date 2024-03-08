@@ -5,43 +5,27 @@ import catchAsync from '../../../utils/catchAsync.js';
 import Email from '../../../utils/email.js';
 import { emailingPromise } from '../../../utils/helperFun.js';
 import { createNotification } from '../../../controllers/notificationController.js';
+import addedTeamMemberFunc from '../auxFunction/addTeamMember.js';
+import durationInDaysFunc from '../auxFunction/durationInDays.js';
 
 const createProject = catchAsync(async (req, res, next) => {
   const { title, description, teamMembers, startDate, endDate, price } = req.body;
   //'2022-02-15T12:30:00'
-  const mongoStartDate = new Date(startDate);
-  const mongoEndDate = new Date(endDate);
-  const durationInMilliseconds = mongoEndDate - mongoStartDate;
 
-  if (durationInMilliseconds < 0)
-    return next(new AppError('Sorry, Start date cannot be later than End date!', 400));
+  const { durationInDays, mongoStartDate, mongoEndDate } = durationInDaysFunc(
+    startDate,
+    endDate
+  );
 
-  const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
+  const newTeamMembers = teamMembers ? teamMembers : [];
 
-  const users = await User.find(
-    { email: { $in: teamMembers } },
-    { _id: 1, email: 1 }
-  ).lean();
+  const users =
+    newTeamMembers.length > 0
+      ? await User.find({ email: { $in: newTeamMembers } }, { _id: 1, email: 1 }).lean()
+      : [];
 
-  const foundEmails = users.map((user) => user.email);
-
-  const notFoundEmails = teamMembers.filter((email) => !foundEmails.includes(email));
-
-  if (notFoundEmails.length > 0)
-    return next(
-      new AppError(
-        `Sorry,the following email(s) are not linked to any account on Traverse yet: ${notFoundEmails.join(
-          ', '
-        )}`,
-        400
-      )
-    );
-
-  const addedTeamMember = users.map((userObj) => {
-    return {
-      user: userObj._id
-    };
-  });
+  const addedTeamMember = addedTeamMemberFunc(users, newTeamMembers);
+  addedTeamMember.push({ user: req.user._id });
 
   const newProject = {
     title,
@@ -56,7 +40,9 @@ const createProject = catchAsync(async (req, res, next) => {
 
   const project = await Project.create(newProject);
 
-  if (teamMembers.length > 0) {
+  await Project.populate(project, { path: 'teamMembers.user' }); // Populates the user field of the added team members
+
+  if (newTeamMembers.length > 0) {
     const notificationPromise = users.map((user) =>
       createNotification(
         user._id,
@@ -73,7 +59,7 @@ const createProject = catchAsync(async (req, res, next) => {
 
   const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
 
-  await emailingPromise(Project, url, teamMembers, project, 'create', Email);
+  await emailingPromise(Project, url, newTeamMembers, project, 'create', Email);
 
   res.status(200).json({
     status: 'success',
