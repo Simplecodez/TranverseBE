@@ -82,6 +82,18 @@ class Email {
     await this.setOptionsAndSend(subject, pubObject, 'projectCreated', recipientEmail);
   }
 
+  async sendAssignedTask(taskTitle, projectName, url) {
+    const pubObject = {
+      name: this.name,
+      projectName,
+      subject: 'Assigned task',
+      url,
+      taskTitle
+    };
+
+    await this.setOptionsAndSend('Assigned task', pubObject, 'assignedTask');
+  }
+
   async sendDeclineProject(message, subject) {
     const pubObject = {
       name: this.name,

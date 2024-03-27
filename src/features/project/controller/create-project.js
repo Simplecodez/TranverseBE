@@ -24,7 +24,7 @@ const createProject = catchAsync(async (req, res, next) => {
       ? await User.find({ email: { $in: newTeamMembers } }, { _id: 1, email: 1 }).lean()
       : [];
 
-  const addedTeamMember = addedTeamMemberFunc(users, newTeamMembers);
+  const addedTeamMember = addedTeamMemberFunc(users, newTeamMembers, req);
   addedTeamMember.push({ user: req.user._id });
 
   const newProject = {
@@ -59,7 +59,7 @@ const createProject = catchAsync(async (req, res, next) => {
 
   const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
 
-  await emailingPromise(Project, url, newTeamMembers, project, 'create', Email);
+  await emailingPromise(url, newTeamMembers, project, 'create');
 
   res.status(200).json({
     status: 'success',

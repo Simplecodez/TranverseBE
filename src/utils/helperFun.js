@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 import otpGenerator from 'otp-generator';
+import Project from '../models/projectModel.js';
+import Email from './email.js';
 // import AppError from './appError';
 
 const licenceNumberGenerator = () => {
@@ -9,22 +11,12 @@ const licenceNumberGenerator = () => {
     upperCase: false,
     specialChars: false
   });
-  const hashedLicence = crypto
-    .createHash('sha256')
-    .update(licence)
-    .digest('hex');
+  const hashedLicence = crypto.createHash('sha256').update(licence).digest('hex');
 
   return { licence, hashedLicence };
 };
 
-const emailingPromise = async (
-  Project,
-  url,
-  teamMembers,
-  project,
-  action,
-  Email
-) => {
+const emailingPromise = async (url, teamMembers, project, action) => {
   try {
     const emailPromise = teamMembers.map((email) => {
       return new Email(project).sendProjectCreated(

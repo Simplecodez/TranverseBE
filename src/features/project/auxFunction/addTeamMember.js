@@ -1,6 +1,16 @@
 import AppError from '../../../utils/appError.js';
 
-const addedTeamMemberFunc = (usersData, teamMembers) => {
+const addedTeamMemberFunc = (usersData, teamMembers, req) => {
+  const projectOwnerEmailContainedInTeamMemberArray = teamMembers.find(
+    (email) => email === req.user.email
+  );
+  if (projectOwnerEmailContainedInTeamMemberArray) {
+    throw new AppError(
+      'Sorry! You will automatically be added to the project as the admin or owner. No need to add yourself manually.',
+      400
+    );
+  }
+
   const foundEmails = usersData.map((user) => user.email);
   const notFoundEmails = teamMembers.filter((email) => !foundEmails.includes(email));
 

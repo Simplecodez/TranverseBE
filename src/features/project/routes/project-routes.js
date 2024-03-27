@@ -10,6 +10,7 @@ import updateProjectStatus from '../controller/update-project-status.js';
 import updateProjectTeamMembers from '../controller/update-project-member.js';
 import deleteProject from '../controller/delete-project.js';
 import getOne from '../controller/get-one-project.js';
+import updateTaskStatus from '../controller/update-task-status.js';
 
 const router = express.Router();
 router.use(protect);
@@ -19,11 +20,8 @@ router.get('/decline', declineProject);
 router.get('/tasks', getTask);
 router.patch('/:id/assignTask', assignTasks);
 router.post('/:id/addMember', updateProjectTeamMembers);
+router.post('/:id/update-task-status', updateTaskStatus);
 
-router
-  .route('/:id')
-  .get(getOne)
-  .patch(updateProjectStatus)
-  .delete(restrictTo('user'), deleteProject);
+router.route('/:id').get(getOne).patch(updateProjectStatus).delete(restrictTo('user'), deleteProject);
 
 export default router;

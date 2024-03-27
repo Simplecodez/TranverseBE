@@ -7,10 +7,7 @@ const projectSchema = new mongoose.Schema({
     required: [true, 'Please provide a project name.'],
     validate: {
       validator: (value) => {
-        return (
-          validator.isLength(value, { min: 3, max: 50 }) &&
-          validator.matches(value, /^[a-zA-Z\s]+$/)
-        );
+        return validator.isLength(value, { min: 3, max: 50 }) && validator.matches(value, /^[a-zA-Z\s]+$/);
       },
       message: 'Please provide a project title.'
     }
@@ -20,10 +17,7 @@ const projectSchema = new mongoose.Schema({
     required: [true, 'Please provide a project description.'],
     validate: {
       validator: (value) => {
-        return (
-          validator.isLength(value, { min: 3, max: 500 }) &&
-          validator.matches(value, /^[a-zA-Z\s.]+$/)
-        );
+        return validator.isLength(value, { min: 3, max: 500 }) && validator.matches(value, /^[a-zA-Z\s.]+$/);
       },
       message: 'Please provide a project description.'
     }
@@ -68,12 +62,30 @@ const projectSchema = new mongoose.Schema({
           type: mongoose.Schema.ObjectId,
           ref: 'User'
         },
+        dueTime: {
+          type: String,
+          required: [true, 'Please provide a due time for the assigned task.'],
+          validate: {
+            validator: function (value) {
+              return /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
+            },
+            message: (props) => `${props.value} is not a valid time format. Please use format HH:MM (24-hour format).`
+          }
+        },
         dueDate: {
-          type: Date
+          type: String,
+          required: [true, 'Please provide a due date for the assigned task.'],
+          validate: {
+            validator: function (value) {
+              return /^\d{4}-\d{2}-\d{2}$/.test(value) || /^\d{2}-\d{2}-\d{4}$/.test(value);
+            },
+            message: (props) =>
+              `${props.value} is not a valid date format. Please use either 'YYYY-MM-DD' or 'DD-MM-YYYY' format.`
+          }
         },
         status: {
           type: String,
-          enum: ['Todo', 'In Progress', 'Done'],
+          enum: ['Todo', 'InProgress', 'InReview', 'Done'],
           default: 'Todo'
         }
       }
