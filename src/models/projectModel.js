@@ -62,16 +62,16 @@ const projectSchema = new mongoose.Schema({
           type: mongoose.Schema.ObjectId,
           ref: 'User'
         },
-        dueTime: {
-          type: String,
-          required: [true, 'Please provide a due time for the assigned task.'],
-          validate: {
-            validator: function (value) {
-              return /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
-            },
-            message: (props) => `${props.value} is not a valid time format. Please use format HH:MM (24-hour format).`
-          }
-        },
+        // dueTime: {
+        //   type: String,
+        //   required: [true, 'Please provide a due time for the assigned task.'],
+        //   validate: {
+        //     validator: function (value) {
+        //       return /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value);
+        //     },
+        //     message: (props) => `${props.value} is not a valid time format. Please use format HH:MM (24-hour format).`
+        //   }
+        // },
         dueDate: {
           type: String,
           required: [true, 'Please provide a due date for the assigned task.'],

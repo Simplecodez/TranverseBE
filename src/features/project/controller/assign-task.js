@@ -6,7 +6,7 @@ import Email from '../../../utils/email.js';
 import { createNotification } from '../../../controllers/notificationController.js';
 
 const assignTasks = catchAsync(async (req, res, next) => {
-  const { task, email, name, dueDate, dueTime } = req.body;
+  const { task, email, name, dueDate } = req.body;
   const projectID = req.params.id;
   const project = await Project.findOne({
     _id: projectID,
@@ -28,7 +28,6 @@ const assignTasks = catchAsync(async (req, res, next) => {
 
   task.assignedTo = member._id;
   task.dueDate = dueDate;
-  task.dueTime = dueTime;
 
   project.tasks.push(task);
 

@@ -24,10 +24,7 @@ class Email {
   }
 
   async setOptionsAndSend(...args) {
-    const html = pug.renderFile(
-      path.join(currentDir, `../views/email/${args[2]}.pug`),
-      args[1]
-    );
+    const html = pug.renderFile(path.join(currentDir, `../views/email/${args[2]}.pug`), args[1]);
     const mailOptions = {
       from: this.from,
       to: args[3] ? args[3] : this.to,
@@ -80,6 +77,17 @@ class Email {
     };
 
     await this.setOptionsAndSend(subject, pubObject, 'projectCreated', recipientEmail);
+  }
+
+  async sendProjectCreatedEmailNotFound(recipientEmail, projectName, url, subject) {
+    const pubObject = {
+      name: this.name,
+      projectName,
+      subject,
+      url
+    };
+
+    await this.setOptionsAndSend(subject, pubObject, 'projectCreatedNotFoundUsers', recipientEmail);
   }
 
   async sendAssignedTask(taskTitle, projectName, url) {

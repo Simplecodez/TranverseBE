@@ -32,7 +32,7 @@ const updateProjectTeamMembers = catchAsync(async (req, res, next) => {
   }
 
   // check whether the users are on Traverse and return the users in a object form
-  const addedTeamMember = addedTeamMemberFunc(users, teamMembers, req);
+  const { addedTeamMember, notFoundEmails, foundEmails } = addedTeamMemberFunc(users, newTeamMembers, req);
 
   // Add the users to the project team members
   project.teamMembers.push(...addedTeamMember);
@@ -53,11 +53,19 @@ const updateProjectTeamMembers = catchAsync(async (req, res, next) => {
     )
   );
 
-  await Promise.all([Promise.all(notificationPromise), emailingPromise(url, teamMembers, project, 'update')]);
+  await Promise.all([
+    Promise.all(notificationPromise),
+    emailingPromise(url, foundEmails, notFoundEmails, project, 'update')
+  ]);
 
   res.status(200).json({
     status: 'success',
-    message: 'You have successfully sent invite(s) for this project',
+    message:
+      notFoundEmails.length <= 0 && foundEmails.length > 0
+        ? 'Project was created successfully and invites have been sent.'
+        : `These email(s) don't have accounts on Traverse: ${notFoundEmails.join(
+            ', '
+          )}. An invite has been sent to them to join traverse.`,
     project
   });
 });

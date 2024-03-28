@@ -16,22 +16,41 @@ const licenceNumberGenerator = () => {
   return { licence, hashedLicence };
 };
 
-const emailingPromise = async (url, teamMembers, project, action) => {
+const emailingPromise = async (url, foundEmails, notFoundEmails, project, action) => {
   try {
-    if (teamMembers.length > 0) {
-      const emailPromise = teamMembers.map((email) => {
-        return new Email(project).sendProjectCreated(email, project.title, url, 'Invitation for Collaboration.');
-      });
+    if (foundEmails.length > 0 || notFoundEmails.length > 0) {
+      const totalPromise = [];
+      if (foundEmails.length > 0) {
+        const emailPromise = foundEmails.map((email) => {
+          return new Email(project).sendProjectCreated(email, project.title, url, 'Invitation for Collaboration.');
+        });
+        totalPromise.push(...emailPromise);
+      }
+
+      if (notFoundEmails.length > 0) {
+        const emailPromise = notFoundEmails.map((email) => {
+          return new Email(project).sendProjectCreatedEmailNotFound(
+            email,
+            project.title,
+            url,
+            'Invitation to Traverse and Project Collaboration.'
+          );
+        });
+        totalPromise.push(...emailPromise);
+      }
+
       const userProjectPromise = new Email(project).sendUserProject(
         `You have successfully ${action === 'create' ? 'created and ' : ''} sent invite for ${project.title} project.`,
         'Invites success!'
       );
-      const totalPromise = [...emailPromise, userProjectPromise];
+
+      totalPromise.push(userProjectPromise);
+
       await Promise.all(totalPromise);
       return;
     }
 
-    if (teamMembers.length <= 0 && action === 'create') {
+    if (foundEmails.length <= 0 && notFoundEmails <= 0 && action === 'create') {
       await new Email(project).sendUserProject(`You have successfully created ${project.title} project.`, '');
       return;
     }
