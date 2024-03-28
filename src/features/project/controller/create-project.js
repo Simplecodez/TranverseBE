@@ -30,7 +30,8 @@ const createProject = catchAsync(async (req, res, next) => {
     startDate: mongoStartDate,
     endDate: mongoEndDate,
     owner: req.user._id,
-    teamMembers: addedTeamMember
+    teamMembers: addedTeamMember,
+    usersNotRegistered: [...notFoundEmails]
   };
 
   const project = await Project.create(newProject);

@@ -32,10 +32,11 @@ const updateProjectTeamMembers = catchAsync(async (req, res, next) => {
   }
 
   // check whether the users are on Traverse and return the users in a object form
-  const { addedTeamMember, notFoundEmails, foundEmails } = addedTeamMemberFunc(users, newTeamMembers, req);
+  const { addedTeamMember, notFoundEmails, foundEmails } = addedTeamMemberFunc(users, teamMembers, req);
 
   // Add the users to the project team members
   project.teamMembers.push(...addedTeamMember);
+  project.usersNotRegistered.push(...notFoundEmails);
   await project.save();
   await Project.populate(project, { path: 'teamMembers.user' });
 

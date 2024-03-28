@@ -125,6 +125,9 @@ const projectSchema = new mongoose.Schema({
     default: true,
     select: false
   },
+  usersNotRegistered: {
+    type: [String]
+  },
   createAt: {
     type: Date,
     default: Date.now
