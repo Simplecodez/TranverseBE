@@ -43,7 +43,7 @@ const updateProjectTeamMembers = catchAsync(async (req, res, next) => {
   project.name = req.user.name;
   project.email = req.user.email;
 
-  const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
+  const url = `${process.env.FE_URL}/accept?id=${project._id}`;
 
   const notificationPromise = users.map((user) =>
     createNotification(

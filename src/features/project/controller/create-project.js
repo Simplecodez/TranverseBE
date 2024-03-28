@@ -1,28 +1,21 @@
 import Project from '../../../models/projectModel.js';
 import User from '../../../models/userModel.js';
-import AppError from '../../../utils/appError.js';
 import catchAsync from '../../../utils/catchAsync.js';
-import Email from '../../../utils/email.js';
 import { emailingPromise } from '../../../utils/helperFun.js';
 import { createNotification } from '../../../controllers/notificationController.js';
 import addedTeamMemberFunc from '../auxFunction/addTeamMember.js';
 import durationInDaysFunc from '../auxFunction/durationInDays.js';
 
 const createProject = catchAsync(async (req, res, next) => {
-  const { title, description, teamMembers, startDate, endDate, price } = req.body;
+  const { title, description, teamMembers, startDate, endDate, price, priceCurrency } = req.body;
   //'2022-02-15T12:30:00'
 
-  const { durationInDays, mongoStartDate, mongoEndDate } = durationInDaysFunc(
-    startDate,
-    endDate
-  );
+  const { durationInDays, mongoStartDate, mongoEndDate } = durationInDaysFunc(startDate, endDate);
 
   const newTeamMembers = teamMembers ? teamMembers : [];
 
   const users =
-    newTeamMembers.length > 0
-      ? await User.find({ email: { $in: newTeamMembers } }, { _id: 1, email: 1 }).lean()
-      : [];
+    newTeamMembers.length > 0 ? await User.find({ email: { $in: newTeamMembers } }, { _id: 1, email: 1 }).lean() : [];
 
   const addedTeamMember = addedTeamMemberFunc(users, newTeamMembers, req);
   addedTeamMember.push({ user: req.user._id });
@@ -31,6 +24,7 @@ const createProject = catchAsync(async (req, res, next) => {
     title,
     description,
     price,
+    priceCurrency,
     duration: durationInDays,
     startDate: mongoStartDate,
     endDate: mongoEndDate,
@@ -44,11 +38,7 @@ const createProject = catchAsync(async (req, res, next) => {
 
   if (newTeamMembers.length > 0) {
     const notificationPromise = users.map((user) =>
-      createNotification(
-        user._id,
-        'invite',
-        `You got an invite from ${req.user.name} to collaborate on ${title} `
-      )
+      createNotification(user._id, 'invite', `You got an invite from ${req.user.name} to collaborate on ${title} `)
     );
     await Promise.all(notificationPromise);
   }
@@ -57,7 +47,7 @@ const createProject = catchAsync(async (req, res, next) => {
 
   project.name = req.user.name;
 
-  const url = `https://traversemob.vercel.app/project/accept?id=${project._id}`;
+  const url = `${process.env.FE_URL}/accept?id=${project._id}`;
 
   await emailingPromise(url, newTeamMembers, project, 'create');
 

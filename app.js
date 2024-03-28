@@ -23,7 +23,7 @@ import initSocket from './src/features/chat/socket.js';
 
 const app = express();
 
-const allowedOrigins = ['https://traversemob.vercel.app/', 'http://localhost:3000'];
+const allowedOrigins = ['https://traversemob.vercel.app', 'http://localhost:3000', `${process.env.FE_URL}`];
 
 const server = http.createServer(app, {
   cors: {

@@ -34,13 +34,9 @@ const assignTasks = catchAsync(async (req, res, next) => {
 
   // Awaiting the promise to resolve individually to get errors that may occur.
   await project.save();
-  await createNotification(
-    member._id,
-    'assigned',
-    `You've been assigned a task on ${project.title}.`
-  );
+  await createNotification(member._id, 'assigned', `You've been assigned a task on ${project.title}.`);
 
-  const url = 'https://traversemob.vercel.app/notification';
+  const url = `${process.env.FE_URL}/notification`;
 
   try {
     await new Email({ email, name }).sendAssignedTask(task.title, project.title, url);

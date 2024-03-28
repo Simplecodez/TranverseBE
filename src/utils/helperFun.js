@@ -18,21 +18,23 @@ const licenceNumberGenerator = () => {
 
 const emailingPromise = async (url, teamMembers, project, action) => {
   try {
-    const emailPromise = teamMembers.map((email) => {
-      return new Email(project).sendProjectCreated(
-        email,
-        project.title,
-        url,
-        'Invitation for Collaboration.'
+    if (teamMembers.length > 0) {
+      const emailPromise = teamMembers.map((email) => {
+        return new Email(project).sendProjectCreated(email, project.title, url, 'Invitation for Collaboration.');
+      });
+      const userProjectPromise = new Email(project).sendUserProject(
+        `You have successfully ${action === 'create' ? 'created and ' : ''} sent invite for ${project.title} project.`,
+        'Invites success!'
       );
-    });
-    const userProjectPromise = new Email(project).sendUserProject(
-      `You have successfully sent invite for ${project.title} project.`,
-      'Invites success!'
-    );
-    const totalPromise = [...emailPromise, userProjectPromise];
-    await Promise.all(totalPromise);
-    return 'email sent';
+      const totalPromise = [...emailPromise, userProjectPromise];
+      await Promise.all(totalPromise);
+      return;
+    }
+
+    if (teamMembers.length <= 0 && action === 'create') {
+      await new Email(project).sendUserProject(`You have successfully created ${project.title} project.`, '');
+      return;
+    }
   } catch (err) {
     if (action === 'create') await Project.deleteOne({ _id: project._id });
     throw err;

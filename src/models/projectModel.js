@@ -17,9 +17,9 @@ const projectSchema = new mongoose.Schema({
     required: [true, 'Please provide a project description.'],
     validate: {
       validator: (value) => {
-        return validator.isLength(value, { min: 3, max: 500 }) && validator.matches(value, /^[a-zA-Z\s.]+$/);
+        return validator.isLength(value, { min: 3, max: 3000 }) && validator.matches(value, /^[a-zA-Z\s.]+$/);
       },
-      message: 'Please provide a project description.'
+      message: 'Description is too long.'
     }
   },
   owner: {
@@ -96,6 +96,11 @@ const projectSchema = new mongoose.Schema({
     type: Number,
     default: 10,
     required: [true, 'Please provide the price for an hour.']
+  },
+  priceCurrency: {
+    type: String,
+    enum: ['USD', 'EUR', 'GBP', 'NGN'],
+    default: 'NGN'
   },
   duration: {
     type: Number,

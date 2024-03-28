@@ -37,10 +37,7 @@ const signup = catchAsync(async (req, res, next) => {
 });
 
 const activateAccount = catchAsync(async (req, res, next) => {
-  const hashedLicence = crypto
-    .createHash('sha256')
-    .update(req.body.licence)
-    .digest('hex');
+  const hashedLicence = crypto.createHash('sha256').update(req.body.licence).digest('hex');
   const user = await User.findOne({
     licence: hashedLicence
   });
@@ -63,12 +60,7 @@ const signin = catchAsync(async (req, res, next) => {
   }
   if (user && (await user.correctPassword(password, user.password))) {
     if (!user.active) {
-      return next(
-        new AppError(
-          `You have not activated your account. Please do so to gain access.`,
-          401
-        )
-      );
+      return next(new AppError(`You have not activated your account. Please do so to gain access.`, 401));
     }
   }
   createSendToken(user, 200, 'Signed in successfully.', req, res);
@@ -125,7 +117,7 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
   // 3. Send it to user's email
-  const resetURL = `https://traversemob.vercel.app/auth/reset?token=${resetToken}`;
+  const resetURL = `${process.env.FE_URL}/auth/reset?token=${resetToken}`;
 
   try {
     await new Email({
@@ -141,9 +133,7 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
-    return next(
-      new AppError('There was an error sending the email. Try again later!', 500)
-    );
+    return next(new AppError('There was an error sending the email. Try again later!', 500));
   }
 });
 
@@ -161,8 +151,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   }
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
-  if (user.password !== user.passwordConfirm)
-    return next(new AppError('Passwords are not the same', 400));
+  if (user.password !== user.passwordConfirm) return next(new AppError('Passwords are not the same', 400));
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
@@ -172,14 +161,4 @@ const resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, ' Password reset was successful.', req, res);
 });
 
-export {
-  signup,
-  signin,
-  activateAccount,
-  protect,
-  restrictTo,
-  signout,
-  forgotPassword,
-  resetPassword,
-  getMe
-};
+export { signup, signin, activateAccount, protect, restrictTo, signout, forgotPassword, resetPassword, getMe };
