@@ -53,6 +53,7 @@ app.use(xss());
 app.use(compression());
 
 app.get('/', (req, res) => {
+  console.log(req.secure, 'It is secureeeeeeeeeeeeeeeeeeeeee');
   res.send('welcome to TraverseBE');
 });
 const currentDir = path.dirname(fileURLToPath(import.meta.url));

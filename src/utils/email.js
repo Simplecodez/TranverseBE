@@ -69,6 +69,7 @@ class Email {
   }
 
   async sendProjectCreated(recipientEmail, projectName, url, subject) {
+    console.log(this.name);
     const pubObject = {
       name: this.name,
       projectName,
