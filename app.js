@@ -1,5 +1,5 @@
 import path from 'path';
-import https from 'https';
+import http from 'http';
 import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
@@ -25,7 +25,7 @@ const app = express();
 
 const allowedOrigins = ['https://traversemob.vercel.app', 'http://localhost:3000', `${process.env.FE_URL}`];
 
-const server = https.createServer(app, {
+const server = http.createServer(app, {
   cors: {
     origin: allowedOrigins
   }
