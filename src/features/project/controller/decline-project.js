@@ -5,7 +5,7 @@ import Email from '../../../utils/email.js';
 import { createNotification } from '../../../controllers/notificationController.js';
 
 const declineProject = catchAsync(async (req, res, next) => {
-  console.log(req.originalUrl);
+  // console.log(req.originalUrl);
   const { id } = req.query;
   const project = await Project.findById(id);
   const { _id, email, name } = await User.findById(project.owner);

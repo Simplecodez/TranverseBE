@@ -17,7 +17,6 @@ const getAll = catchAsync(async (req, res, next) => {
   })
     .populate('owner')
     .populate('teamMembers');
-  console.log(req.user._id);
 
   res.status(200).json({
     status: 'success',
