@@ -12,10 +12,7 @@ const userSearch = catchAsync(async (req, res, next) => {
   if (query.length >= 3) {
     // Search function by name or email
     users = await User.find({
-      $or: [
-        { name: { $regex: query, $options: 'i' } },
-        { email: { $regex: query, $options: 'i' } }
-      ]
+      $or: [{ name: { $regex: query, $options: 'i' } }, { email: { $regex: query, $options: 'i' } }]
     });
   }
   res.status(200).json({
@@ -61,26 +58,13 @@ const resizeUserPhoto = catchAsync(async (req, res, next) => {
 
 const updateAccount = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id).select('+password');
-  const { companyName, passwordCurrent, password, passwordConfirm, bio } = req.body;
-  const fieldsAllowed = [
-    'companyName',
-    'password',
-    'passwordConfirm',
-    'passwordCurrent',
-    'bio'
-  ];
+  const { companyName, passwordCurrent, password, passwordConfirm, bio, stack } = req.body;
+  const fieldsAllowed = ['companyName', 'password', 'passwordConfirm', 'passwordCurrent', 'bio', 'stack'];
   const postedFields = Object.keys(req.body);
-  const invalidFields = postedFields.filter(
-    (element) => !fieldsAllowed.includes(element)
-  );
+  const invalidFields = postedFields.filter((element) => !fieldsAllowed.includes(element));
 
   if (invalidFields.length > 0)
-    return next(
-      new AppError(
-        `You are not allowed to update the field(s): '${invalidFields.join(', ')}'.`,
-        400
-      )
-    );
+    return next(new AppError(`You are not allowed to update the field(s): '${invalidFields.join(', ')}'.`, 400));
 
   if (password) {
     if (!passwordConfirm) {
@@ -103,6 +87,8 @@ const updateAccount = catchAsync(async (req, res, next) => {
   if (req.file) user.photo = req.file.filename;
 
   if (bio) user.bio = bio;
+
+  if (stack) user.stack = stack;
 
   await user.save();
 

@@ -9,10 +9,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please tell us your name!'],
     validate: {
       validator: (value) => {
-        return (
-          validator.isLength(value, { min: 3, max: 50 }) &&
-          validator.matches(value, /^[a-zA-Z\s]+$/)
-        );
+        return validator.isLength(value, { min: 3, max: 50 }) && validator.matches(value, /^[a-zA-Z\s]+$/);
       },
       message: 'Please your name must be 3 or more characters.'
     }
@@ -28,10 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: (value) => {
-        return (
-          validator.isLength(value, { min: 3, max: 500 }) &&
-          validator.matches(value, /^[a-zA-Z\s]+$/)
-        );
+        return validator.isLength(value, { min: 3, max: 500 }) && validator.matches(value, /^[a-zA-Z\s]+$/);
       },
       message: 'Please your name must be 3 or more characters.'
     }
@@ -41,10 +35,7 @@ const userSchema = new mongoose.Schema({
     required: false,
     validate: {
       validator: (value) => {
-        return (
-          validator.isLength(value, { min: 3, max: 50 }) &&
-          validator.matches(value, /^[a-zA-Z0-9\s]+$/)
-        );
+        return validator.isLength(value, { min: 3, max: 50 }) && validator.matches(value, /^[a-zA-Z0-9\s]+$/);
       },
       message: 'Invalid company name, Only Alphanumeric characters and "," are allowed'
     }
@@ -91,6 +82,7 @@ const userSchema = new mongoose.Schema({
     default: false,
     select: false
   },
+  stack: { type: String, required: [true, 'Please enter your stack!'] },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date

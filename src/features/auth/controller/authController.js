@@ -11,7 +11,7 @@ import protectAux from '../auxFunctions/protect.js';
 
 const signup = catchAsync(async (req, res, next) => {
   const { licence, hashedLicence } = licenceNumberGenerator();
-  const { name, email, companyName, website, password, passwordConfirm } = req.body;
+  const { name, email, companyName, website, password, passwordConfirm, stack } = req.body;
 
   const newUser = {
     name,
@@ -19,7 +19,8 @@ const signup = catchAsync(async (req, res, next) => {
     companyName,
     website,
     password,
-    passwordConfirm
+    passwordConfirm,
+    stack
   };
   newUser.licence = hashedLicence;
   const user = await User.create(newUser);

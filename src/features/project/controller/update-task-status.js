@@ -15,19 +15,26 @@ const updateTaskStatus = catchAsync(async (req, res, next) => {
 
   const foundTeamMember = project.teamMembers.find((member) => member.user.equals(req.user._id));
 
-  if (!foundTeamMember) return next(new AppError('You are not authorized for this action!', 400));
+  if (!foundTeamMember) return next(new AppError('You are not authorized for this action!', 401));
 
   if (status === 'Done' && !project.owner.equals(req.user._id))
     return next(
       new AppError('Your are not authorized for this action! you are not allowed to mark this task as Done!', 401)
     );
 
-  if (statuses.includes(status) && project.owner.equals(req.user._id))
-    return next(new AppError('Your are not authorized for this action! You can only mark task as Done.', 401));
-
-  //   const task = project.tasks.find((task) => task._id.equals(taskID));
-
   const taskIndex = project.tasks.findIndex((task) => task._id.equals(taskID));
+
+  // This checks if the user is the owner of the project.
+  // if yes, and the status includes includes any status from the array of statuses.
+  // Then the id if the user is compared to that of the assignee.
+  // if the don match, he can update the status to any from the statuses array.
+
+  if (
+    statuses.includes(status) &&
+    project.owner.equals(req.user._id) &&
+    !project.tasks[taskIndex].assignedTo.equals(req.user._id)
+  )
+    return next(new AppError('Your are not authorized for this action! You can only mark task as Done.', 401));
 
   if (taskIndex === -1) {
     return next(new AppError('Task not found in project', 404));

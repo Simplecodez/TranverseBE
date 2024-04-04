@@ -1,0 +1,8 @@
+// .eslintrc.json
+{
+  "plugins": ["security"],
+  "rules": {
+    "security/detect-object-injection": "warn"
+    // Add more security rules as needed
+  }
+}

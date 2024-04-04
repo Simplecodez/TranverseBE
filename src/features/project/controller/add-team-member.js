@@ -2,7 +2,6 @@ import Project from '../../../models/projectModel.js';
 import User from '../../../models/userModel.js';
 import AppError from '../../../utils/appError.js';
 import catchAsync from '../../../utils/catchAsync.js';
-import Email from '../../../utils/email.js';
 import { emailingPromise } from '../../../utils/helperFun.js';
 import { createNotification } from '../../../controllers/notificationController.js';
 import addedTeamMemberFunc from '../auxFunction/addTeamMember.js';

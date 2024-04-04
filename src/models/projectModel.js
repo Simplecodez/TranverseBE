@@ -22,6 +22,9 @@ const projectSchema = new mongoose.Schema({
       message: 'Description is too long and can only allow '
     }
   },
+  coverImage: {
+    type: String
+  },
   owner: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',

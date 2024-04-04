@@ -7,7 +7,7 @@ import addedTeamMemberFunc from '../auxFunction/addTeamMember.js';
 import durationInDaysFunc from '../auxFunction/durationInDays.js';
 
 const createProject = catchAsync(async (req, res, next) => {
-  const { title, description, teamMembers, startDate, endDate, price, priceCurrency } = req.body;
+  const { title, description, teamMembers, startDate, endDate, price, priceCurrency, coverImage } = req.body;
   //'2022-02-15T12:30:00'
 
   const { durationInDays, mongoStartDate, mongoEndDate } = durationInDaysFunc(startDate, endDate);
@@ -31,7 +31,8 @@ const createProject = catchAsync(async (req, res, next) => {
     endDate: mongoEndDate,
     owner: req.user._id,
     teamMembers: addedTeamMember,
-    usersNotRegistered: [...notFoundEmails]
+    usersNotRegistered: [...notFoundEmails],
+    coverImage
   };
 
   const project = await Project.create(newProject);

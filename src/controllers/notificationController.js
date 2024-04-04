@@ -6,7 +6,7 @@ const createNotification = async (user, type, message) => {
   try {
     await Notification.create({ user: user._id, notification_type: type, message });
   } catch (error) {
-    next(error);
+    throw error;
   }
 };
 
