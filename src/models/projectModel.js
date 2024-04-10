@@ -30,6 +30,10 @@ const projectSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  files: {
+    type: [String],
+    default: []
+  },
   teamMembers: {
     type: [
       {

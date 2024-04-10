@@ -13,6 +13,8 @@ import getOne from '../controller/get-one-project.js';
 import updateTaskStatus from '../controller/update-task-status.js';
 import updateProjecDetails from '../controller/update-tasks-details.js';
 import updateProjectStatusAndDescription from '../controller/update-project-details.js';
+import { saveFileToDB, uploadFile } from '../controller/upload-project-file.js';
+import streamFile from '../controller/streamFile.js';
 
 const router = express.Router();
 
@@ -25,6 +27,8 @@ router.patch('/:id/assignTask', assignTasks);
 router.post('/:id/addMember', updateProjectTeamMembers);
 router.patch('/:id/update-task-status', updateTaskStatus);
 router.patch('/:id/update-task-details', updateProjecDetails);
+router.patch('/:id/uploadFile', uploadFile, saveFileToDB);
+router.get('/:id/streamFile', streamFile);
 
 router.route('/:id').get(getOne).patch(updateProjectStatusAndDescription).delete(restrictTo('user'), deleteProject);
 

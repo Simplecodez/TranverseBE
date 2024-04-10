@@ -20,6 +20,7 @@ import userRoutes from './src/routes/userRoutes.js';
 import notificationRoutes from './src/routes/notificationRoutes.js';
 import commentRoutes from './src/routes/commentRoutes.js';
 import initSocket from './src/features/chat/socket.js';
+import { protect } from './src/features/auth/controller/authController.js';
 
 const app = express();
 
@@ -53,11 +54,11 @@ app.use(xss());
 app.use(compression());
 
 app.get('/', (req, res) => {
-  console.log(req.secure, 'It is secureeeeeeeeeeeeeeeeeeeeee');
+  // console.log(req.secure, 'It is secureeeeeeeeeeeeeeeeeeeeee');
   res.send('welcome to TraverseBE');
 });
-const currentDir = path.dirname(fileURLToPath(import.meta.url));
-app.use('/dp', express.static(path.join(currentDir, '/public/img/users')));
+// const currentDir = path.dirname(fileURLToPath(import.meta.url));
+// app.use('/:id/download', protect, express.static(path.join(currentDir, `/public/project/${req.params.id}`)));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/project', projectRoutes);
