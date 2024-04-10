@@ -4,7 +4,7 @@ import multer from 'multer';
 import AppError from '../../../utils/appError.js';
 import catchAsync from '../../../utils/catchAsync.js';
 import Project from '../../../models/projectModel.js';
-import sanitizeFilename from '../../../utils/sanitizeFileName.js';
+import sanitizeFilename from '../../../utils/sanitizeFilename.js';
 
 const allowedFileTypes = [
   'image/jpeg',
