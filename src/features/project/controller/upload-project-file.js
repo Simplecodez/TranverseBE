@@ -58,6 +58,10 @@ const saveFileToDB = catchAsync(async (req, res, next) => {
   }
   const project = await Project.findById(req.params.id);
   if (!project) return next(new AppError('Project not found!', 404));
+
+  if (!project.owner.equals(req.user._id))
+    return new AppError('You are not allowed to upload files for this project.', 403);
+
   const originalFilename = req.file.originalname;
   const sanitizedFilename = sanitizeFilename(originalFilename);
   const fileNameWithoutExtension = path.parse(sanitizedFilename).name;

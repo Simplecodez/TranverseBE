@@ -135,7 +135,8 @@ const projectSchema = new mongoose.Schema({
 });
 
 projectSchema.pre(/^find/, function (next) {
-  this.populate({ path: 'teamMembers.user', select: '-_id name email' });
+  // this.populate({ path: 'teamMembers.user', select: '-_id name email' });
+  this.populate({ path: 'teamMembers.user' });
   next();
 });
 
