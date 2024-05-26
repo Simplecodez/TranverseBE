@@ -79,8 +79,7 @@ const userSchema = new mongoose.Schema({
   },
   active: {
     type: Boolean,
-    default: false,
-    select: false
+    default: false
   },
   stack: { type: String, required: [true, 'Please enter your stack!'] },
   passwordChangedAt: Date,

@@ -58,8 +58,8 @@ const resizeUserPhoto = catchAsync(async (req, res, next) => {
 
 const updateAccount = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id).select('+password');
-  const { companyName, passwordCurrent, password, passwordConfirm, bio, stack } = req.body;
-  const fieldsAllowed = ['companyName', 'password', 'passwordConfirm', 'passwordCurrent', 'bio', 'stack'];
+  const { companyName, passwordCurrent, password, passwordConfirm, bio, stack, photoURL } = req.body;
+  const fieldsAllowed = ['companyName', 'password', 'passwordConfirm', 'passwordCurrent', 'bio', 'photoURL', 'stack'];
   const postedFields = Object.keys(req.body);
   const invalidFields = postedFields.filter((element) => !fieldsAllowed.includes(element));
 
@@ -84,7 +84,7 @@ const updateAccount = catchAsync(async (req, res, next) => {
     user.companyName = companyName;
   }
 
-  if (req.file) user.photo = req.file.filename;
+  if (photoURL) user.photo = photoURL;
 
   if (bio) user.bio = bio;
 

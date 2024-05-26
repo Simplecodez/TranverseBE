@@ -8,6 +8,7 @@ import AppError from '../../../utils/appError.js';
 import { createSendToken } from '../../../utils/jwt.utils.js';
 import { licenceNumberGenerator } from '../../../utils/helperFun.js';
 import protectAux from '../auxFunctions/protect.js';
+import { Stats } from 'fs';
 
 const signup = catchAsync(async (req, res, next) => {
   const { licence, hashedLicence } = licenceNumberGenerator();
@@ -45,9 +46,11 @@ const activateAccount = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError('Invalid Licence Number', 400));
   }
+  if (user.active) return next(new AppError('Account already activated.'));
+  console.log(user);
   user.active = true;
-  await user.save({ validateBeforeSave: false });
-  createSendToken(user, 200, 'Account activated successfully.', req, res);
+  await user.save();
+  res.status(200).json({ Stats: 200, message: 'Account activated succesfully.' });
 });
 
 const signin = catchAsync(async (req, res, next) => {
@@ -55,7 +58,7 @@ const signin = catchAsync(async (req, res, next) => {
   if (!email || !password) {
     return next(new AppError('Please provide email and password', 400));
   }
-  const user = await User.findOne({ email }).select('+password -__v +active');
+  const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError(`Incorrect email or password.`, 401));
   }
@@ -83,7 +86,7 @@ const protect = catchAsync(async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
-
+  console.log(token);
   //Attach the fresh user to the request
 
   req.user = await protectAux(token, next);

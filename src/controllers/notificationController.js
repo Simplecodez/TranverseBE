@@ -1,6 +1,7 @@
 import Notification from '../models/notificationModel.js';
 import catchAsync from '../utils/catchAsync.js';
 import User from '../models/userModel.js';
+import AppError from '../utils/appError.js';
 
 const createNotification = async (user, type, message) => {
   try {
@@ -29,4 +30,16 @@ const getNotifications = catchAsync(async (req, res, next) => {
   });
 });
 
-export { createNotification, getNotifications, createNotificationFE };
+const markAsRead = catchAsync(async (req, res, next) => {
+  const notificationiD = req.params.id;
+  if (!notificationiD) return next(new AppError('Notification parameter is missing.'));
+  const notification = await Notification.findById(notificationiD);
+  notification.read = true;
+  notification.save();
+  res.json(200).json({
+    status: 'success',
+    message: 'Status read.'
+  });
+});
+
+export { createNotification, getNotifications, createNotificationFE, markAsRead };

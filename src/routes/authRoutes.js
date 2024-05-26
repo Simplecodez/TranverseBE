@@ -1,9 +1,5 @@
 import express from 'express';
-import {
-  uploadUserPhoto,
-  resizeUserPhoto,
-  updateAccount
-} from '../controllers/userController.js';
+import { updateAccount } from '../controllers/userController.js';
 import {
   signup,
   signin,
@@ -24,7 +20,7 @@ router.get('/signout', signout);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 router.use(protect);
-router.post('/settings', uploadUserPhoto, resizeUserPhoto, updateAccount);
+router.post('/settings', updateAccount);
 router.get('/me', getMe);
 
 export default router;

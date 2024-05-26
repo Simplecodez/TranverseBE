@@ -7,8 +7,8 @@ import Email from './email.js';
 const licenceNumberGenerator = () => {
   const licence = otpGenerator.generate(6, {
     digits: true,
-    alphabets: false,
-    upperCase: false,
+    upperCaseAlphabets: false,
+    lowerCaseAlphabets: false,
     specialChars: false
   });
   const hashedLicence = crypto.createHash('sha256').update(licence).digest('hex');
